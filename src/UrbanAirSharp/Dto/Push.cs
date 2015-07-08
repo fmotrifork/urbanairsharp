@@ -168,10 +168,5 @@ namespace UrbanAirSharp.Dto
 		//TODO: not implemented yet
 		[JsonProperty("message")]
 		public RichMessage RichMessage { get; private set; }
-
-		//public void SetAudience(AudienceType audienceType, String value)
-		//{
-		//	Audience = new Audience(audienceType, value);
-		//}
 	}
 }

@@ -76,13 +76,14 @@ namespace UrbanAirSharp
 		/// <param name="deviceId">use null for broadcast or deviceTypes must contain 1 element that distinguishes this deviceId</param>
 		/// <param name="deviceAlerts">per device alert messages and extras</param>
 		/// <param name="customAudience">a more specific way to choose the audience for the push. If this is set, deviceId is ignored</param>
-		[Obsolete("Please use the other versions of this method.")]
+		[Obsolete("Please use the other versions of this method.", false)]
 		public PushResponse Push(String alert, IEnumerable<DeviceType> deviceTypes = null, String deviceId = null, IEnumerable<BaseAlert> deviceAlerts = null, Audience customAudience = null)
 		{
 			Push content = BackwardCompatibilityCreate(alert, deviceTypes, deviceId, deviceAlerts, customAudience);
 			return Push(content);
         }
 
+		[Obsolete("Please do not use, it is only here to support old Push(...) and Validate(...) methods!")]
 		static Push BackwardCompatibilityCreate(String alert, IEnumerable<DeviceType> deviceTypes = null, String deviceId = null, IEnumerable<BaseAlert> deviceAlerts = null, Audience customAudience = null)
 		{
 			Push content = null;
@@ -110,7 +111,7 @@ namespace UrbanAirSharp
 		/// <param name="deviceId">use null for broadcast or deviceTypes must contain 1 element that distinguishes this deviceId</param>
 		/// <param name="deviceAlerts">per device alert messages and extras</param>
 		/// <param name="customAudience">a more specific way to choose the audience for the push. If this is set, deviceId is ignored</param>
-		[Obsolete("Please use the other versions of this method.")]
+		[Obsolete("Please use the other versions of this method.", false)]
 		public PushResponse Validate(String alert, IEnumerable<DeviceType> deviceTypes = null, String deviceId = null,
 			IEnumerable<BaseAlert> deviceAlerts = null, Audience customAudience = null)
 		{
@@ -203,9 +204,7 @@ namespace UrbanAirSharp
             return SendRequest(request);
 		}
 
-		//=====================================================================================================================
-
-		private static TResponse SendRequest<TResponse>(BaseRequest<TResponse> request) where TResponse : BaseResponse, new()
+		static TResponse SendRequest<TResponse>(BaseRequest<TResponse> request) where TResponse : BaseResponse, new()
 		{
 			try
 			{
