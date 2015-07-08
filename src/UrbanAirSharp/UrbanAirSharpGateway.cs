@@ -41,12 +41,28 @@ namespace UrbanAirSharp
 
 	public class UrbanAirSharpGateway
 	{
-		private static readonly ILog Log = LogManager.GetLogger(typeof(UrbanAirSharpGateway));
-
-		public UrbanAirSharpGateway(String appKey, String appMasterSecret)
+		private static readonly ILog Log;
+		static UrbanAirSharpGateway()
 		{
-			XmlConfigurator.Configure();
-			ServiceModelConfig.Create(appKey, appMasterSecret);
+			try
+			{
+				XmlConfigurator.Configure();
+			}
+			catch { }
+			Log = LogManager.GetLogger(typeof(UrbanAirSharpGateway));
+		}
+
+		readonly ServiceModelConfig _cfg;
+
+		public UrbanAirSharpGateway() 
+			: this(ServiceModelConfig.Instance) { }
+		
+		public UrbanAirSharpGateway(String appKey, String appMasterSecret) 
+			: this(ServiceModelConfig.Create(appKey, appMasterSecret)) { }
+
+		public UrbanAirSharpGateway(ServiceModelConfig cfg)
+		{
+			_cfg = cfg;
 		}
 
 		/// <summary>
@@ -60,10 +76,30 @@ namespace UrbanAirSharp
 		/// <param name="deviceId">use null for broadcast or deviceTypes must contain 1 element that distinguishes this deviceId</param>
 		/// <param name="deviceAlerts">per device alert messages and extras</param>
 		/// <param name="customAudience">a more specific way to choose the audience for the push. If this is set, deviceId is ignored</param>
-		/// <returns></returns>
-		public PushResponse Push(String alert, IList<DeviceType> deviceTypes = null, String deviceId = null, IList<BaseAlert> deviceAlerts = null, Audience customAudience = null)
+		[Obsolete("Please use the other versions of this method.")]
+		public PushResponse Push(String alert, IEnumerable<DeviceType> deviceTypes = null, String deviceId = null, IEnumerable<BaseAlert> deviceAlerts = null, Audience customAudience = null)
 		{
-			return SendRequest(new PushRequest(CreatePush(alert, deviceTypes, deviceId, deviceAlerts, customAudience)));
+			Push content = BackwardCompatibilityCreate(alert, deviceTypes, deviceId, deviceAlerts, customAudience);
+			return Push(content);
+        }
+
+		static Push BackwardCompatibilityCreate(String alert, IEnumerable<DeviceType> deviceTypes = null, String deviceId = null, IEnumerable<BaseAlert> deviceAlerts = null, Audience customAudience = null)
+		{
+			Push content = null;
+			if (customAudience != null)
+				content = new Push(alert, customAudience, deviceAlerts);
+			else if (deviceTypes != null && !string.IsNullOrWhiteSpace(deviceId))
+			{
+				IEnumerable<Device> devices = from dt in deviceTypes select new Device(deviceId, dt);
+				content = new Push(alert, devices, deviceAlerts);
+			}
+			return content;
+		}
+
+		public PushResponse Push(Push content)
+		{
+			var request = new PushRequest(content, _cfg);
+			return SendRequest(request);
 		}
 
 		/// <summary>
@@ -74,36 +110,48 @@ namespace UrbanAirSharp
 		/// <param name="deviceId">use null for broadcast or deviceTypes must contain 1 element that distinguishes this deviceId</param>
 		/// <param name="deviceAlerts">per device alert messages and extras</param>
 		/// <param name="customAudience">a more specific way to choose the audience for the push. If this is set, deviceId is ignored</param>
-		/// <returns></returns>
-		public PushResponse Validate(String alert, IList<DeviceType> deviceTypes = null, String deviceId = null,
-			IList<BaseAlert> deviceAlerts = null, Audience customAudience = null)
+		[Obsolete("Please use the other versions of this method.")]
+		public PushResponse Validate(String alert, IEnumerable<DeviceType> deviceTypes = null, String deviceId = null,
+			IEnumerable<BaseAlert> deviceAlerts = null, Audience customAudience = null)
 		{
-			return SendRequest(new PushValidateRequest(CreatePush(alert, deviceTypes, deviceId, deviceAlerts, customAudience)));
+			Push content = BackwardCompatibilityCreate(alert, deviceTypes, deviceId, deviceAlerts, customAudience);
+			return Validate(content);
+		}
+
+		public PushResponse Validate(Push content)
+		{
+			var request = new PushValidateRequest(content, _cfg);
+			return SendRequest(request);
 		}
 
 		public ScheduleCreateResponse CreateSchedule(Schedule schedule)
         {
-			return SendRequest(new ScheduleCreateRequest(schedule));
+			var request = new ScheduleCreateRequest(schedule, _cfg);
+            return SendRequest(request);
         }
 
 		public ScheduleEditResponse EditSchedule(Guid scheduleId, Schedule schedule)
         {
-			return SendRequest(new ScheduleEditRequest(scheduleId, schedule));
+			var request = new ScheduleEditRequest(scheduleId, schedule, _cfg);
+            return SendRequest(request);
         }
 
 		public BaseResponse DeleteSchedule(Guid scheduleId)
         {
-			return SendRequest(new ScheduleDeleteRequest(scheduleId));
+			var request = new ScheduleDeleteRequest(scheduleId, _cfg);
+            return SendRequest(request);
         }
 
         public ScheduleGetResponse GetSchedule(Guid scheduleId)
         {
-			return SendRequest(new ScheduleGetRequest(scheduleId));
+			var request = new ScheduleGetRequest(scheduleId, _cfg);
+            return SendRequest(request);
         }
 
         public ScheduleListResponse ListSchedules()
         {
-			return SendRequest(new ScheduleListRequest());
+			var request = new ScheduleListRequest(_cfg);
+            return SendRequest(request);
         }
 
 		/// <summary>
@@ -127,7 +175,8 @@ namespace UrbanAirSharp
 			if (string.IsNullOrEmpty(deviceToken.Token))
 				throw new ArgumentException("A device Tokens Token field is Required", "deviceToken");
 
-			return SendRequest(new DeviceTokenRequest(deviceToken));
+			var request = new DeviceTokenRequest(deviceToken, _cfg);
+            return SendRequest(request);
 		}
 
 		public BaseResponse CreateTag(Tag tag)
@@ -135,7 +184,8 @@ namespace UrbanAirSharp
 			if (string.IsNullOrEmpty(tag.TagName))
 				throw new ArgumentException("A tag name is Required", "tag.TagName");
 
-			return SendRequest(new TagCreateRequest(tag));
+			var request = new TagCreateRequest(tag, _cfg);
+            return SendRequest(request);
 		}
 
 		public BaseResponse DeleteTag(string tag)
@@ -143,77 +193,14 @@ namespace UrbanAirSharp
 			if (string.IsNullOrEmpty(tag))
 				throw new ArgumentException("A tag is Required", "tag");
 
-			return SendRequest(new TagDeleteRequest(tag));
+			var request = new TagDeleteRequest(tag, _cfg);
+            return SendRequest(request);
 		}
 
 		public TagListResponse ListTags()
 		{
-			return SendRequest(new TagListRequest());
-		}
-
-		public static Push CreatePush(String alert, IList<DeviceType> deviceTypes = null, String deviceId = null, IList<BaseAlert> deviceAlerts = null, Audience customAudience = null)
-		{
-			var push = new Push()
-			{
-				Notification = new Notification()
-				{
-					DefaultAlert = alert
-				}
-			};
-
-			if (customAudience != null)
-			{
-				deviceId = null;
-
-				push.Audience = customAudience;
-			}
-
-			if (deviceTypes != null)
-			{
-				push.DeviceTypes = deviceTypes;
-
-				if (deviceId != null)
-				{
-					if (deviceTypes.Count != 1)
-					{
-						throw new InvalidOperationException("when deviceId is not null, deviceTypes must contain 1 element which identifies the deviceId type");
-					}
-
-					var deviceType = deviceTypes[0];
-
-					switch (deviceType)
-					{
-						case DeviceType.Android:
-							push.SetAudience(AudienceType.Android, deviceId);
-							break;
-						case DeviceType.Ios:
-							push.SetAudience(AudienceType.Ios, deviceId);
-							break;
-						case DeviceType.Wns:
-							push.SetAudience(AudienceType.Windows, deviceId);
-							break;
-						case DeviceType.Mpns:
-							push.SetAudience(AudienceType.WindowsPhone, deviceId);
-							break;
-						case DeviceType.Blackberry:
-							push.SetAudience(AudienceType.Blackberry, deviceId);
-							break;
-					}
-				}
-			}
-
-			if (deviceAlerts == null || deviceAlerts.Count <= 0)
-			{
-				return push;
-			}
-
-			push.Notification.AndroidAlert = (AndroidAlert)deviceAlerts.FirstOrDefault(x => x is AndroidAlert);
-			push.Notification.IosAlert = (IosAlert)deviceAlerts.FirstOrDefault(x => x is IosAlert);
-			push.Notification.WindowsAlert = (WindowsAlert)deviceAlerts.FirstOrDefault(x => x is WindowsAlert);
-			push.Notification.WindowsPhoneAlert = (WindowsPhoneAlert)deviceAlerts.FirstOrDefault(x => x is WindowsPhoneAlert);
-			push.Notification.BlackberryAlert = (BlackberryAlert)deviceAlerts.FirstOrDefault(x => x is BlackberryAlert);
-
-			return push;
+			var request = new TagListRequest(_cfg);
+            return SendRequest(request);
 		}
 
 		//=====================================================================================================================
@@ -237,5 +224,6 @@ namespace UrbanAirSharp
 				};
 			}
 		}
+
 	}
 }

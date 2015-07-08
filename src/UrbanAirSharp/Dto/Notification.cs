@@ -6,8 +6,19 @@ namespace UrbanAirSharp.Dto
 {
 	public class Notification
 	{
-		[JsonProperty("alert")]
-		public String DefaultAlert { get; set; }
+		string _default;
+		[JsonProperty("alert", Required = Required.Always)]
+		public String DefaultAlert
+		{
+			get { return _default; }
+			set
+			{
+				if (string.IsNullOrEmpty(value))
+					throw new ArgumentException("DefaultAlert can not be null or empty!");
+
+				_default = value;
+			}
+		}
 
 		[JsonProperty("android")]
 		public AndroidAlert AndroidAlert { get; set; }

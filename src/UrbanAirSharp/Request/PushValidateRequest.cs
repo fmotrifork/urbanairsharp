@@ -11,8 +11,8 @@ namespace UrbanAirSharp.Request
 	/// </summary>
 	public class PushValidateRequest : PushRequest
 	{
-		public PushValidateRequest(Push push)
-			: base(push)
+		public PushValidateRequest(Push push, ServiceModelConfig cfg)
+			: base(push, cfg)
 		{
 			RequestUrl = "api/push/validate/";
 		}

@@ -11,7 +11,7 @@ namespace UrbanAirSharp.Request
 	/// </summary>
 	public class ScheduleDeleteRequest : DeleteRequest<BaseResponse>
 	{
-		public ScheduleDeleteRequest(Guid scheduleId)
+		public ScheduleDeleteRequest(Guid scheduleId, ServiceModelConfig cfg) : base(cfg)
 		{
 			RequestUrl = "api/schedules/" + scheduleId + "/";
 		}

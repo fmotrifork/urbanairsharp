@@ -11,7 +11,7 @@ namespace UrbanAirSharp.Request
     /// <see cref="http://docs.urbanairship.com/reference/api/v3/registration.html"/>
 	public class DeviceTokenRequest : PutRequest<BaseResponse, DeviceToken>
     {
-        public DeviceTokenRequest(DeviceToken device) : base(device)
+        public DeviceTokenRequest(DeviceToken device, ServiceModelConfig cfg) : base(device, cfg)
         {
             if (string.IsNullOrEmpty(device.Token))
                 throw new ArgumentException("The device tokens Token field is required", "device");

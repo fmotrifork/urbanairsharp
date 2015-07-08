@@ -8,8 +8,8 @@ namespace UrbanAirSharp.Request.Base
 {
 	public class DeleteRequest<TResponse> : BaseRequest<TResponse> where TResponse : BaseResponse, new()
 	{
-		public DeleteRequest()
-			: base(ServiceModelConfig.Host, ServiceModelConfig.HttpClient, ServiceModelConfig.SerializerSettings)
+		public DeleteRequest(ServiceModelConfig cfg)
+			: base(cfg)
 		{
 			RequestMethod = HttpMethod.Delete;
 		}

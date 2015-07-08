@@ -1,5 +1,7 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Runtime.CompilerServices;
 
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
@@ -7,7 +9,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("UrbanAirSharp")]
 [assembly: AssemblyDescription("C# .Net library to simplify server-side calls to the Urban Airship API Version 3")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("UrbanAirSharp")]
 [assembly: AssemblyProduct("UrbanAirSharp")]
 [assembly: AssemblyCopyright("Copyright © Jeff Gosling (jeffery.gosling@gmail.com) 2014")]
 [assembly: AssemblyTrademark("")]
@@ -17,6 +19,8 @@ using System.Runtime.InteropServices;
 // to COM components.  If you need to access a type in this assembly from 
 // COM, set the ComVisible attribute to true on that type.
 [assembly: ComVisible(false)]
+[assembly: InternalsVisibleTo("TestApp")]
+[assembly: InternalsVisibleTo("UrbanAirSharp.TestApp")]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
 [assembly: Guid("e99d3143-1d57-40dd-8ff7-5cd8570e17f0")]

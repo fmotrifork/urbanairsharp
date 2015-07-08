@@ -162,7 +162,7 @@ namespace TestApp
 				{
 					ScheduleTime = DateTime.Now.AddMinutes(5)
 				},
-				Push = UrbanAirSharpGateway.CreatePush("Scheduled Push")
+				Push = new Push("Scheduled Push"),
 			};
 
 			Console.WriteLine("CREATE SCHEDULE:");
