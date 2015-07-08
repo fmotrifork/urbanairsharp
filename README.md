@@ -1,4 +1,4 @@
-UrbanAirSharp
+UrbanAirSharp [![Build status](https://ci.appveyor.com/api/projects/status/e9e6cy3p299h1wi6?svg=true)](https://ci.appveyor.com/project/ronin1/urbanairsharp)
 =============
 
 UrbanAirSharp is a C# .Net library to simplify server-side calls to the Urban Airship API Version 3.
