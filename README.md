@@ -42,9 +42,9 @@ client.Push(message);
 Here are some more examples of the supported functionality
 ```csharp
 var drivingCars = new Audience(AudienceType.Segment, "automotive")
-	.And(new Audience(AudienceType.Tag, "track"))
+	.And(new Audience(AudienceType.Tag, "running"))
 	.And(new Audience(AudienceType.Tag, "street"))
-	.And(new Audience(AudienceType.Tag, "show").Not());
+	.And(new Audience(AudienceType.Tag, "parked").Not());
 
 client.Validate(new Push("Honk horns", drivingCars));
 ```
@@ -52,9 +52,9 @@ client.Validate(new Push("Honk horns", drivingCars));
 Which is the same as
 ```csharp
 var drivingCars = new Audience(AudienceType.Segment, "automotive") &
-	new Audience(AudienceType.Tag, "track") &
+	new Audience(AudienceType.Tag, "running") &
 	new Audience(AudienceType.Tag, "street") &
-	!new Audience(AudienceType.Android, "");
+	!new Audience(AudienceType.Tag, "parked");
 
 client.Validate(new Push("Honk horns", drivingCars));
 ```
