@@ -134,11 +134,10 @@ namespace UrbanAirSharp.Dto
 			//}
 		}
 
-		//IList<DeviceType> _deviceTypes;
+		//IEnumerable<DeviceType> _deviceTypes;
 
-		[JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
-		[JsonProperty("device_types", Required = Required.Always, DefaultValueHandling = DefaultValueHandling.Include)]
-		public virtual DeviceType DeviceTypes
+		[JsonIgnore]
+		public virtual IEnumerable<DeviceType> DeviceTypes
 		{
 			get; set;
 
@@ -154,6 +153,21 @@ namespace UrbanAirSharp.Dto
 			//	var list = value as IList<DeviceType>;
 			//	_deviceTypes = list;
 			//}
+		}
+
+		[JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
+		[JsonProperty("device_types", Required = Required.Always, NullValueHandling = NullValueHandling.Ignore)]
+		public virtual dynamic DeviceSet
+		{
+			get
+			{
+				if (DeviceTypes == null)
+					return DeviceType.All;
+				else if (DeviceTypes.Count() > 1)
+					return DeviceTypes;
+				else
+					return DeviceTypes.FirstOrDefault();
+			}
 		}
 
 		[JsonProperty("options")]

@@ -54,7 +54,7 @@ namespace TestApp
 			Console.WriteLine();
 
 			Console.WriteLine("PUSH Broadcast Alert to Androids");
-			response = _urbanAirSharpGateway.Push(new Push("Broadcast Alert to Androids") { DeviceTypes = DeviceType.Android });
+			response = _urbanAirSharpGateway.Push(new Push("Broadcast Alert to Androids") { DeviceTypes = new[] { DeviceType.Android } });
 			Console.Write(response.HttpResponseCode + " - ");
 			Console.WriteLine(response.Ok ? "SUCCESS" : "FAILED");
 			Console.WriteLine();

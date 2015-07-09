@@ -87,7 +87,7 @@ More use cases for push
 ```csharp
 client.Push(new Push("Broadcast Alert")); //push to everyone
 
-client.Push(new Push("Push to all Androids") { DeviceTypes = DeviceType.Android });
+client.Push(new Push("Push to all Androids") { DeviceTypes = new[] { DeviceType.Android } });
 
 client.Push(new Push("Every device own by a User", 
 				new Audience(AudienceType.Ios, "iphone-6-abc") |
