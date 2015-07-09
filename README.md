@@ -32,7 +32,7 @@ Support for the following still needs to be added
 The source includes a test project which has examples on the supported functionality of the library
 
 Using the library is very easy. Simply supply your UA keys and call Push
-```
+```csharp
 var client = new UrbanAirSharpGateway(AppKey, AppMasterSecret);
 var myPhone = new Device("my-device-id", DeviceType.Ios);
 var message = new Push("What's up", myPhone);
@@ -40,7 +40,7 @@ client.Push(message);
 ```
 
 Here are some more examples of the supported functionality
-```
+```csharp
 var drivingCars = new Audience(AudienceType.Segment, "automotive")
 	.And(new Audience(AudienceType.Tag, "track"))
 	.And(new Audience(AudienceType.Tag, "street"))
@@ -50,7 +50,7 @@ client.Validate(new Push("Honk horns", drivingCars));
 ```
 
 Which is the same as
-```
+```csharp
 var drivingCars = new Audience(AudienceType.Segment, "automotive") &
 	new Audience(AudienceType.Tag, "track") &
 	new Audience(AudienceType.Tag, "street") &
@@ -60,7 +60,7 @@ client.Validate(new Push("Honk horns", drivingCars));
 ```
 
 More use cases for push
-```
+```csharp
 client.Push(new Push("Broadcast Alert")); //push to everyone
 
 client.Push(new Push("Push to all Androids") { DeviceTypes = DeviceType.Android });
@@ -72,7 +72,7 @@ client.Push(new Push("Every device own by a User",
 ```
 
 This is an example of a more complicated, audience targeted Push
-```	
+```csharp
 client.Push(new Push("Custom Android Alert per device type", new[]
 {
 	new AndroidAlert()
