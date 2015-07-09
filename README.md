@@ -39,6 +39,30 @@ var message = new Push("What's up", myPhone);
 client.Push(message);
 ```
 
+Note that you can store the keys in your web config or environment variables and use the default constructor to instanciate clients like so:
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<configuration>
+	<appSettings>
+		<add key="UrbanAirSharp.uaAppKey" value="your app key"/>
+		<add key="UrbanAirSharp.uaAppMAsterSecret" value="your app secret"/>
+
+		<!-- incase you need to force all requests through a traffic inspector -->
+		<add key="UrbanAirSharp.host" value="https://custom.ua/api-path"/> 
+	</appSettings>
+</configuration>
+```
+```cmd
+setx UrbanAirSharp.uaAppKey "your app key" /m
+setx UrbanAirSharp.uaAppMAsterSecret "your app secret" /m
+
+@rem incase you need to force all requests through a traffic inspector
+setx UrbanAirSharp.uaAppMAsterSecret "https://custom.ua/api-path" /m
+```
+```csharp
+var client = new UrbanAirSharpGateway();
+```
+
 Here are some more examples of the supported functionality
 ```csharp
 var drivingCars = new Audience(AudienceType.Segment, "automotive")
