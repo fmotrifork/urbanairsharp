@@ -35,7 +35,7 @@ namespace TestApp
 			Console.WriteLine("================ TESTING VALIDATE ================");
 			Console.WriteLine();
 
-			var response = _urbanAirSharpGateway.Validate("Validate push", new List<DeviceType> { DeviceType.Android }, TestDeviceGuid);
+			var response = _urbanAirSharpGateway.Validate(new Push("Validate push", new Device(TestDeviceGuid, DeviceType.Android)));
 
 			Console.Write(response.HttpResponseCode + " - ");
 			Console.WriteLine(response.Ok ? "SUCCESS" : "FAILED");
