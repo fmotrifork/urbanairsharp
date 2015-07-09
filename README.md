@@ -37,43 +37,53 @@ var client = new UrbanAirSharpGateway(AppKey, AppMasterSecret);
 var myPhone = new Device("my-device-id", DeviceType.Ios);
 var message = new Push("What's up", myPhone);
 client.Push(message);
-
 ```
+
 Here are some more examples of the supported functionality
+```
+var drivingCars = new Audience(AudienceType.Segment, "automotive")
+	.And(new Audience(AudienceType.Tag, "track"))
+	.And(new Audience(AudienceType.Tag, "street"))
+	.And(new Audience(AudienceType.Tag, "show").Not());
 
-    client.Validate("Validate push", new List<DeviceType>() { DeviceType.Android }, "946fdc3d-0284-468f-a2f7-d007ed694907"); 
+client.Validate(new Push("Honk horns", drivingCars));
+```
 
-	client.Push("Broadcast Alert");
+Which is the same as
+```
+var drivingCars = new Audience(AudienceType.Segment, "automotive") &
+	new Audience(AudienceType.Tag, "track") &
+	new Audience(AudienceType.Tag, "street") &
+	!new Audience(AudienceType.Android, "");
 
-	client.Push("Broadcast Alert to Androids", new List<DeviceType>() { DeviceType.Android });
+client.Validate(new Push("Honk horns", drivingCars));
+```
 
-	client.Push("Targeted Alert to device", new List<DeviceType>() { DeviceType.Android }, "946fdc3d-0284-468f-a2f7-d007ed694907");
+More use cases for push
+```
+client.Push(new Push("Broadcast Alert")); //push to everyone
+
+client.Push(new Push("Push to all Androids") { DeviceTypes = DeviceType.Android });
+
+client.Push(new Push("Every device own by a User", 
+				new Audience(AudienceType.Ios, "iphone-6-abc") |
+				new Audience(AudienceType.Ios, "ipad-1-xyz") |
+				new Audience(AudienceType.Windows, "workstation-123")));
+```
 
 This is an example of a more complicated, audience targeted Push
-	
-	client.Push("Custom Alert per device type", null, null, new List<BaseAlert>()
+```	
+client.Push(new Push("Custom Android Alert per device type", new[]
+{
+	new AndroidAlert()
 	{
-		new AndroidAlert()
-		{
-			Alert = "Custom Android Alert",
-			CollapseKey = "Collapse_Key",
-			DelayWhileIdle = true,
-			GcmTimeToLive = 5
-		}
-	});
-
-	//these are just examples of tags
-	var rugbyFanAudience = new Audience(AudienceType.Tag, "Rugby Fan");
-	var footballFanAudience = new Audience(AudienceType.Tag, "Football Fan");
-	var notFootballFanAudience = new Audience().NotAudience(footballFanAudience);
-	var newZealandAudience = new Audience(AudienceType.Alias, "NZ");
-	var englishAudience = new Audience(AudienceType.Tag, "language_en");
-
-	var fansAudience = new Audience().OrAudience(new List<Audience>() { rugbyFanAudience, notFootballFanAudience });
-
-	var customAudience = new Audience().AndAudience(new List<Audience>() { fansAudience, newZealandAudience, englishAudience });
-
-	client.Push("English speaking New Zealand Rugby fans", null, null, null, customAudience);
+		Alert = "Custom Android Alert",
+		CollapseKey = "Collapse_Key",
+		DelayWhileIdle = true,
+		GcmTimeToLive = 5
+	}
+}));
+```
 
 # License
 Copyright (c) 2014-2015 Jeff Gosling Licensed under the MIT license.
