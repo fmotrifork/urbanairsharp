@@ -34,8 +34,8 @@ namespace UrbanAirSharp
 			get { return _t; }
 			set
 			{
-				if (value == DeviceType.None)
-					throw new ArgumentException("Type can not be None");
+				if (value == DeviceType.All)
+					throw new ArgumentException("Type can not be " + value);
 
 				_t = value;
 			}

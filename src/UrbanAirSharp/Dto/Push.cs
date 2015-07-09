@@ -26,34 +26,11 @@ namespace UrbanAirSharp.Dto
 	{
 		#region CTOR & helpers
 
-		internal Push(String alert) //shouldbe locked down as this will not generate a push.  The only public CTORs exposed are the one with valid use-case.
+		public Push(String alert, IEnumerable<BaseAlert> deviceAlerts = null)
 		{
 			Notification = new Notification { DefaultAlert = alert };
-		}
 
-		public Push(String alert, Audience audience, IEnumerable<BaseAlert> deviceAlerts = null) 
-			: this(alert, new[] { audience }, deviceAlerts) { }
-
-		public Push(String alert, IEnumerable<Audience> audiences, IEnumerable<BaseAlert> deviceAlerts = null) 
-			: this(alert)
-		{
-			if (audiences == null || audiences.Count() == 0)
-				throw new ArgumentException("audiences can not be null or empty");
-
-			IList<Audience> arr = (from a in audiences where a != null select a).ToArray();
-			if (arr.Count == 0)
-				throw new ArgumentException("devices contains no valid type that can be mapped to proper audiences");
-
-			if (arr.Count == 1)
-				Audience = arr.First();
-			else
-			{
-				var au = new Audience();
-				au.OrAudience(arr);
-				Audience = au;
-			}
-
-			if (deviceAlerts != null)
+			if (deviceAlerts != null && deviceAlerts.Count() > 0)
 			{
 				Notification.AndroidAlert = deviceAlerts.FirstOrDefault(x => x is AndroidAlert) as AndroidAlert;
 				Notification.IosAlert = deviceAlerts.FirstOrDefault(x => x is IosAlert) as IosAlert;
@@ -63,10 +40,19 @@ namespace UrbanAirSharp.Dto
 			}
 		}
 
+		public Push(String alert, IAudience audience, IEnumerable<BaseAlert> deviceAlerts = null) 
+			: this(alert, deviceAlerts)
+		{
+			Audience = audience;			
+		}
+
+		public Push(String alert, Device device, IEnumerable<BaseAlert> deviceAlerts = null) 
+			: this(alert, new[] { device }, deviceAlerts) { }
+
 		public Push(String alert, IEnumerable<Device> devices, IEnumerable<BaseAlert> deviceAlerts = null)
 			: this(alert, CreteAudience(devices), deviceAlerts) { }
 
-		static IEnumerable<Audience> CreteAudience(IEnumerable<Device> devices)
+		static IAudience CreteAudience(IEnumerable<Device> devices)
 		{
 			if (devices == null || devices.Count() == 0)
 				throw new ArgumentException("deviceAlerts can not be null or empty");
@@ -77,27 +63,28 @@ namespace UrbanAirSharp.Dto
 				if (d == null)
 					continue;
 
-				audiences.AddRange(CreteAudience(d.Id, d.Type));
+				audiences.Add(MakeAudience(d.Id, d.Type));
 			}
-			return audiences;
+			return new AudienceOr { Audiences = audiences };
 		}
 
-		static IEnumerable<Audience> CreteAudience(String id, DeviceType dt)
+		static Audience MakeAudience(String id, DeviceType dt)
 		{
-			var audiences = new List<Audience>();
-
-			if (dt.HasFlag(DeviceType.Android))
-				audiences.Add(new Audience(AudienceType.Android, id));
-			if (dt.HasFlag(DeviceType.Ios))
-				audiences.Add(new Audience(AudienceType.Ios, id));
-			if (dt.HasFlag(DeviceType.Wns))
-				audiences.Add(new Audience(AudienceType.Windows, id));
-			if (dt.HasFlag(DeviceType.Mpns))
-				audiences.Add(new Audience(AudienceType.WindowsPhone, id));
-			if (dt.HasFlag(DeviceType.Blackberry))
-				audiences.Add(new Audience(AudienceType.Blackberry, id));
-
-			return audiences;
+			switch(dt)
+			{
+				case DeviceType.Android:
+					return new Audience(AudienceType.Android, id);
+				case DeviceType.Ios:
+					return new Audience(AudienceType.Ios, id);
+				case DeviceType.Wns:
+					return new Audience(AudienceType.Windows, id);
+				case DeviceType.Mpns:
+					return new Audience(AudienceType.WindowsPhone, id);
+				case DeviceType.Blackberry:
+					return new Audience(AudienceType.Blackberry, id);
+				default:
+					throw new ArgumentException("DeviceType dt " + dt + " is not currently supported");
+			}
 		}
 
 		#endregion
@@ -105,10 +92,10 @@ namespace UrbanAirSharp.Dto
 		Notification _notify;
 
 		[JsonProperty("notification", Required = Required.Always)]
-		public Notification Notification
+		public virtual Notification Notification
 		{
 			get { return _notify; }
-			set
+			protected set
 			{
 				if (value == null)
 					throw new ArgumentNullException("Notification");
@@ -117,45 +104,56 @@ namespace UrbanAirSharp.Dto
             }
 		}
 
-		Audience _audience;
+		//IAudience _audience;
 
-		[JsonProperty("audience", Required = Required.Always)]
-		public object Audience
+		[JsonProperty("audience", NullValueHandling = NullValueHandling.Ignore)]
+		public virtual IAudience Audience
 		{
-			get
-			{
-				if (_audience == null)
-				{
-					return "all";
-				}
+			get; set;
+			//get
+			//{
+			//	if (_audience == null)
+			//		return "all";
 
-				return _audience;
-			}
-			set
-			{
-				var audience = value as Audience;
-				_audience = audience;
-			}
+			//	return _audience;
+			//}
+			//protected set
+			//{
+			//	_audience = value as IAudience;
+			//}
 		}
 
-		IList<DeviceType> _deviceTypes;
+		[JsonProperty("audience", NullValueHandling = NullValueHandling.Ignore)]
+		public virtual string AllAudience
+		{
+			get { return Audience == null ? "all" : null; }
+			//set
+			//{
+			//	if (!string.IsNullOrEmpty(value) && string.Compare(value, "all", true) == 0)
+			//		Audience = null;
+			//}
+		}
 
-		[JsonProperty("device_types", Required = Required.Always)]
-		public object DeviceTypes {
-			get 
-			{
-				if (_deviceTypes == null)
-				{
-					return "all";
-				}
+		//IList<DeviceType> _deviceTypes;
+
+		[JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
+		[JsonProperty("device_types", Required = Required.Always, DefaultValueHandling = DefaultValueHandling.Include)]
+		public virtual DeviceType DeviceTypes
+		{
+			get; set;
+
+			//get 
+			//{
+			//	if (_deviceTypes == null)
+			//		return "all";
 					
-				return _deviceTypes;
-			}
-			set
-			{
-				var list = value as IList<DeviceType>;
-				_deviceTypes = list;
-			}
+			//	return _deviceTypes;
+			//}
+			//protected set
+			//{
+			//	var list = value as IList<DeviceType>;
+			//	_deviceTypes = list;
+			//}
 		}
 
 		[JsonProperty("options")]

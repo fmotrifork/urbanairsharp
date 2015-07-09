@@ -7,7 +7,10 @@ using UrbanAirSharp.Type;
 
 namespace UrbanAirSharp.Dto
 {
-	public class Audience
+	/// <summary>
+	/// Atomic audience selector
+	/// </summary>
+	public class Audience : AudienceBase, IAudience
 	{
 		[JsonProperty("apid")]
 		public String AndroidDeviceId { get; private set; }
@@ -32,19 +35,6 @@ namespace UrbanAirSharp.Dto
 
 		[JsonProperty("tag")]
 		public String Tag { get; private set; }
-
-		[JsonProperty("OR")]
-		public IList<Audience> Or { get; private set; }
-
-		[JsonProperty("AND")]
-		public IList<Audience> And { get; private set; }
-
-		[JsonProperty("NOT")]
-		public Audience Not { get; private set; }
-
-		public Audience()
-		{
-		}
 
 		public Audience(AudienceType type, String value)
 		{
@@ -77,56 +67,12 @@ namespace UrbanAirSharp.Dto
 			}
 		}
 
-		public Audience OrAudience(IList<Audience> audiences)
+		public static IAudience operator &(Audience a, IAudience b)
 		{
-			if (Or != null && audiences != null)
-			{
-				audiences = Or.Concat(audiences).ToList();
-			}
+			if (a != null)
+				return a.And(b);
 
-			ClearAudience();
-
-			Or = audiences;
-
-			return this;
-		}
-
-		public Audience AndAudience(IList<Audience> audiences)
-		{
-			if (And != null && audiences != null)
-			{
-				audiences = And.Concat(audiences).ToList();
-			}
-
-			ClearAudience();
-
-			And = audiences;
-
-			return this;
-		}
-
-		public Audience NotAudience(Audience audience)
-		{
-			ClearAudience();
-
-			Not = audience;
-
-			return this;
-		}
-
-		public void ClearAudience()
-		{
-			AndroidDeviceId = null;
-			IosDeviceId = null;
-			WindowsId = null;
-			WindowsPhoneId = null;
-			BlackberryId = null;
-			SegmentId = null;
-			Alias = null;
-			Tag = null;
-			Or = null;
-			And = null;
-			Not = null;
+			return b;
 		}
 	}
 }

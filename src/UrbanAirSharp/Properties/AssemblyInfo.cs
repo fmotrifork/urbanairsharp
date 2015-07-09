@@ -19,8 +19,8 @@ using System.Runtime.CompilerServices;
 // to COM components.  If you need to access a type in this assembly from 
 // COM, set the ComVisible attribute to true on that type.
 [assembly: ComVisible(false)]
-[assembly: InternalsVisibleTo("TestApp")]
-[assembly: InternalsVisibleTo("UrbanAirSharp.TestApp")]
+//[assembly: InternalsVisibleTo("TestApp")]
+//[assembly: InternalsVisibleTo("UrbanAirSharp.TestApp")]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
 [assembly: Guid("e99d3143-1d57-40dd-8ff7-5cd8570e17f0")]

@@ -55,9 +55,16 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Device.cs" />
+    <Compile Include="Dto\AudienceAnd.cs" />
+    <Compile Include="Dto\AudienceBase.cs" />
+    <Compile Include="Dto\AudienceNot.cs" />
+    <Compile Include="Dto\AudienceOr.cs" />
     <Compile Include="Dto\BaseAlert.cs" />
     <Compile Include="Dto\DeviceToken.cs" />
     <Compile Include="Dto\AddRemoveList.cs" />
+    <Compile Include="Dto\DtoExtensions.cs" />
+    <Compile Include="Dto\IAudience.cs" />
+    <Compile Include="Dto\IAudienceCompounder.cs" />
     <Compile Include="Dto\OpenAction.cs" />
     <Compile Include="Dto\AndroidAlert.cs" />
     <Compile Include="Dto\Audience.cs" />

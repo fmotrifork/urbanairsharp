@@ -7,6 +7,9 @@ http://docs.urbanairship.com/reference/api/v3/
 Urban Airship unifies and simplifies the sending of push notifications to mobile devices.
 http://urbanairship.com/
 
+For the latest *bleeding edge* nuget packages, please add this url to your nuget path:
+https://ci.appveyor.com/nuget/urbanairsharp
+
 # API Support
 
 The following API functionality is currently supported
@@ -29,11 +32,13 @@ Support for the following still needs to be added
 The source includes a test project which has examples on the supported functionality of the library
 
 Using the library is very easy. Simply supply your UA keys and call Push
+```
+var client = new UrbanAirSharpGateway(AppKey, AppMasterSecret);
+var myPhone = new Device("my-device-id", DeviceType.Ios);
+var message = new Push("What's up", myPhone);
+client.Push(message);
 
-    var client = new UrbanAirSharpGateway(AppKey, AppMasterSecret);
-
-	client.Push("Hey there - here's a Broadcast");
-
+```
 Here are some more examples of the supported functionality
 
     client.Validate("Validate push", new List<DeviceType>() { DeviceType.Android }, "946fdc3d-0284-468f-a2f7-d007ed694907"); 
