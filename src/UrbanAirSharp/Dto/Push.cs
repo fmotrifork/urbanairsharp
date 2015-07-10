@@ -106,32 +106,22 @@ namespace UrbanAirSharp.Dto
 
 		//IAudience _audience;
 
-		[JsonProperty("audience", NullValueHandling = NullValueHandling.Ignore)]
+		[JsonIgnore]
 		public virtual IAudience Audience
 		{
 			get; set;
-			//get
-			//{
-			//	if (_audience == null)
-			//		return "all";
-
-			//	return _audience;
-			//}
-			//protected set
-			//{
-			//	_audience = value as IAudience;
-			//}
 		}
 
 		[JsonProperty("audience", NullValueHandling = NullValueHandling.Ignore)]
-		public virtual string AllAudience
+		public virtual dynamic AllAudience
 		{
-			get { return Audience == null ? "all" : null; }
-			//set
-			//{
-			//	if (!string.IsNullOrEmpty(value) && string.Compare(value, "all", true) == 0)
-			//		Audience = null;
-			//}
+			get
+			{
+				if (Audience == null)
+					return "all";
+				else
+					return Audience;
+			}
 		}
 
 		//IEnumerable<DeviceType> _deviceTypes;
@@ -140,33 +130,25 @@ namespace UrbanAirSharp.Dto
 		public virtual IEnumerable<DeviceType> DeviceTypes
 		{
 			get; set;
-
-			//get 
-			//{
-			//	if (_deviceTypes == null)
-			//		return "all";
-					
-			//	return _deviceTypes;
-			//}
-			//protected set
-			//{
-			//	var list = value as IList<DeviceType>;
-			//	_deviceTypes = list;
-			//}
 		}
 
-		[JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
+		//[JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
 		[JsonProperty("device_types", Required = Required.Always, NullValueHandling = NullValueHandling.Ignore)]
 		public virtual dynamic DeviceSet
 		{
 			get
 			{
-				if (DeviceTypes == null)
-					return DeviceType.All;
-				else if (DeviceTypes.Count() > 1)
-					return DeviceTypes;
-				else
-					return DeviceTypes.FirstOrDefault();
+                IEnumerable<DeviceType> arr = DeviceTypes;
+                if (arr == null || arr.Count() == 0)
+                    arr = new[] { DeviceType.All };
+
+                string[] res = (from d in arr
+                                group d by d into dg
+                                select dg.Key.ToString().ToLower()).ToArray();
+                if (res.Length > 1)
+                    return res;
+                else
+                    return res.FirstOrDefault();
 			}
 		}
 
