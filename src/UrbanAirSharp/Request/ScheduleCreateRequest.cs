@@ -12,8 +12,8 @@ namespace UrbanAirSharp.Request
 	/// </summary>
 	public class ScheduleCreateRequest : PostRequest<ScheduleCreateResponse, Schedule>
 	{
-		public ScheduleCreateRequest(Schedule schedule)
-			: base(schedule)
+		public ScheduleCreateRequest(Schedule schedule, ServiceModelConfig cfg)
+			: base(schedule, cfg)
 		{
 			RequestUrl = "api/schedules/";
 		}

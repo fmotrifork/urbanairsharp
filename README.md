@@ -7,6 +7,9 @@ http://docs.urbanairship.com/reference/api/v3/
 Urban Airship unifies and simplifies the sending of push notifications to mobile devices.
 http://urbanairship.com/
 
+For the latest *bleeding edge* nuget packages, please add this url to your nuget path:
+https://ci.appveyor.com/nuget/urbanairsharp
+
 # API Support
 
 The following API functionality is currently supported
@@ -29,46 +32,82 @@ Support for the following still needs to be added
 The source includes a test project which has examples on the supported functionality of the library
 
 Using the library is very easy. Simply supply your UA keys and call Push
+```csharp
+var client = new UrbanAirSharpGateway(AppKey, AppMasterSecret);
+var myPhone = new Device("my-device-id", DeviceType.Ios);
+var message = new Push("What's up", myPhone);
+client.Push(message);
+```
 
-    var client = new UrbanAirSharpGateway(AppKey, AppMasterSecret);
+Note that you can store the keys in your web config or environment variables and use the default constructor to instanciate clients like so:
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<configuration>
+	<appSettings>
+		<add key="UrbanAirSharp.uaAppKey" value="your app key"/>
+		<add key="UrbanAirSharp.uaAppMAsterSecret" value="your app secret"/>
 
-	client.Push("Hey there - here's a Broadcast");
+		<!-- incase you need to force all requests through a traffic inspector -->
+		<add key="UrbanAirSharp.host" value="https://custom.ua/api-path"/> 
+	</appSettings>
+</configuration>
+```
+```cmd
+setx UrbanAirSharp.uaAppKey "your app key" /m
+setx UrbanAirSharp.uaAppMAsterSecret "your app secret" /m
+
+@rem incase you need to force all requests through a traffic inspector
+setx UrbanAirSharp.uaAppMAsterSecret "https://custom.ua/api-path" /m
+```
+```csharp
+var client = new UrbanAirSharpGateway();
+```
 
 Here are some more examples of the supported functionality
+```csharp
+var drivingCars = new Audience(AudienceType.Segment, "automotive")
+	.And(new Audience(AudienceType.Tag, "running"))
+	.And(new Audience(AudienceType.Tag, "street"))
+	.And(new Audience(AudienceType.Tag, "parked").Not());
 
-    client.Validate("Validate push", new List<DeviceType>() { DeviceType.Android }, "946fdc3d-0284-468f-a2f7-d007ed694907"); 
+client.Validate(new Push("Honk horns", drivingCars));
+```
 
-	client.Push("Broadcast Alert");
+Which is the same as
+```csharp
+var drivingCars = new Audience(AudienceType.Segment, "automotive") &
+	new Audience(AudienceType.Tag, "running") &
+	new Audience(AudienceType.Tag, "street") &
+	!new Audience(AudienceType.Tag, "parked");
 
-	client.Push("Broadcast Alert to Androids", new List<DeviceType>() { DeviceType.Android });
+client.Validate(new Push("Honk horns", drivingCars));
+```
 
-	client.Push("Targeted Alert to device", new List<DeviceType>() { DeviceType.Android }, "946fdc3d-0284-468f-a2f7-d007ed694907");
+More use cases for push
+```csharp
+client.Push(new Push("Broadcast Alert")); //push to everyone
+
+client.Push(new Push("Push to all Androids") { DeviceTypes = new[] { DeviceType.Android } });
+
+client.Push(new Push("Every device own by a User", 
+				new Audience(AudienceType.Ios, "iphone-6-abc") |
+				new Audience(AudienceType.Ios, "ipad-1-xyz") |
+				new Audience(AudienceType.Windows, "workstation-123")));
+```
 
 This is an example of a more complicated, audience targeted Push
-	
-	client.Push("Custom Alert per device type", null, null, new List<BaseAlert>()
+```csharp
+client.Push(new Push("Custom Android Alert per device type", new[]
+{
+	new AndroidAlert()
 	{
-		new AndroidAlert()
-		{
-			Alert = "Custom Android Alert",
-			CollapseKey = "Collapse_Key",
-			DelayWhileIdle = true,
-			GcmTimeToLive = 5
-		}
-	});
-
-	//these are just examples of tags
-	var rugbyFanAudience = new Audience(AudienceType.Tag, "Rugby Fan");
-	var footballFanAudience = new Audience(AudienceType.Tag, "Football Fan");
-	var notFootballFanAudience = new Audience().NotAudience(footballFanAudience);
-	var newZealandAudience = new Audience(AudienceType.Alias, "NZ");
-	var englishAudience = new Audience(AudienceType.Tag, "language_en");
-
-	var fansAudience = new Audience().OrAudience(new List<Audience>() { rugbyFanAudience, notFootballFanAudience });
-
-	var customAudience = new Audience().AndAudience(new List<Audience>() { fansAudience, newZealandAudience, englishAudience });
-
-	client.Push("English speaking New Zealand Rugby fans", null, null, null, customAudience);
+		Alert = "Custom Android Alert",
+		CollapseKey = "Collapse_Key",
+		DelayWhileIdle = true,
+		GcmTimeToLive = 5
+	}
+}));
+```
 
 # License
 Copyright (c) 2014-2015 Jeff Gosling Licensed under the MIT license.

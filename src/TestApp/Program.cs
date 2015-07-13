@@ -35,7 +35,7 @@ namespace TestApp
 			Console.WriteLine("================ TESTING VALIDATE ================");
 			Console.WriteLine();
 
-			var response = _urbanAirSharpGateway.Validate("Validate push", new List<DeviceType> { DeviceType.Android }, TestDeviceGuid);
+			var response = _urbanAirSharpGateway.Validate(new Push("Validate push", new Device(TestDeviceGuid, DeviceType.Android)));
 
 			Console.Write(response.HttpResponseCode + " - ");
 			Console.WriteLine(response.Ok ? "SUCCESS" : "FAILED");
@@ -48,25 +48,25 @@ namespace TestApp
 			Console.WriteLine();
 
 			Console.WriteLine("PUSH Broadcast Alert");
-			var response = _urbanAirSharpGateway.Push("Broadcast Alert");
+			var response = _urbanAirSharpGateway.Push(new Push("Broadcast Alert"));
 			Console.Write(response.HttpResponseCode + " - ");
 			Console.WriteLine(response.Ok ? "SUCCESS" : "FAILED");
 			Console.WriteLine();
 
 			Console.WriteLine("PUSH Broadcast Alert to Androids");
-			response = _urbanAirSharpGateway.Push("Broadcast Alert to Androids", new List<DeviceType> { DeviceType.Android });
+			response = _urbanAirSharpGateway.Push(new Push("Broadcast Alert to Androids") { DeviceTypes = new[] { DeviceType.Android } });
 			Console.Write(response.HttpResponseCode + " - ");
 			Console.WriteLine(response.Ok ? "SUCCESS" : "FAILED");
 			Console.WriteLine();
 
 			Console.WriteLine("PUSH Targeted Alert to device");
-			response = _urbanAirSharpGateway.Push("Targeted Alert to device", new List<DeviceType> { DeviceType.Android }, TestDeviceGuid);
-			Console.Write(response.HttpResponseCode + " - ");
+			response = _urbanAirSharpGateway.Push(new Push("Targeted Alert to device", new Device("android-id-blah-blah", DeviceType.Android)));
+            Console.Write(response.HttpResponseCode + " - ");
 			Console.WriteLine(response.Ok ? "SUCCESS" : "FAILED");
 			Console.WriteLine();
 
 			Console.WriteLine("PUSH Custom Alert per device type");
-			response = _urbanAirSharpGateway.Push("Custom Alert per device type", null, null, new List<BaseAlert>
+			response = _urbanAirSharpGateway.Push(new Push("Custom Alert per device type", new[]
             {
                 new AndroidAlert
                 {
@@ -75,7 +75,7 @@ namespace TestApp
                     DelayWhileIdle = true,
                     GcmTimeToLive = 5
                 }
-            });
+            }));
 			Console.Write(response.HttpResponseCode + " - ");
 			Console.WriteLine(response.Ok ? "SUCCESS" : "FAILED");
 			Console.WriteLine();
@@ -83,16 +83,17 @@ namespace TestApp
 			//these are just examples of tags
 			var rugbyFanAudience = new Audience(AudienceType.Tag, "Rugby Fan");
 			var footballFanAudience = new Audience(AudienceType.Tag, "Football Fan");
-			var notFootballFanAudience = new Audience().NotAudience(footballFanAudience);
+			var notFootballFanAudience = new AudienceNot { Audience = footballFanAudience };
 			var newZealandAudience = new Audience(AudienceType.Alias, "NZ");
 			var englishAudience = new Audience(AudienceType.Tag, "language_en");
 
-			var fansAudience = new Audience().OrAudience(new List<Audience> { rugbyFanAudience, notFootballFanAudience });
+			var fansAudience = englishAudience.Or(new IAudience[] { rugbyFanAudience, notFootballFanAudience });
 
-			var customAudience = new Audience().AndAudience(new List<Audience> { fansAudience, newZealandAudience, englishAudience });
+			var customAudience = rugbyFanAudience.And(new IAudience[] { fansAudience, !newZealandAudience, !englishAudience });
+			var customAudience2 = rugbyFanAudience & fansAudience & !newZealandAudience & !englishAudience;
 
 			Console.WriteLine("PUSH to custom Audience");
-			response = _urbanAirSharpGateway.Push("English speaking New Zealand Rugby fans", null, null, null, customAudience);
+			response = _urbanAirSharpGateway.Push(new Push("Rugby fans that's not English or New Zellanders", customAudience));
 
 			Console.Write(response.HttpResponseCode + " - ");
 			Console.WriteLine(response.Ok ? "SUCCESS" : "FAILED");
@@ -148,6 +149,26 @@ namespace TestApp
 			Console.Write(response.HttpResponseCode + " - ");
 			Console.WriteLine(response.Ok ? "SUCCESS" : "FAILED");
 			Console.WriteLine();
+
+			var client = new UrbanAirSharpGateway(AppKey, AppMasterSecret);
+			var compoundAudience = new Audience(AudienceType.Android, "") & new Audience(AudienceType.Blackberry, "") & new Audience(AudienceType.Android, "");
+			compoundAudience &= new Audience(AudienceType.Android, "");
+
+			var moreAudience = new AudienceAnd { Audiences = new[] { new Audience(AudienceType.Tag, ""), new Audience(AudienceType.Tag, "") } };
+			compoundAudience &= moreAudience;
+
+			var message = new Push("What's up", compoundAudience);
+
+			client.Push(new Push("Custom Android Alert per device type", new[]
+			{
+				new AndroidAlert()
+				{
+					Alert = "Custom Android Alert",
+					CollapseKey = "Collapse_Key",
+					DelayWhileIdle = true,
+					GcmTimeToLive = 5
+				}
+			}));
 		}
 
 		private static void TestSchedules()
@@ -162,7 +183,7 @@ namespace TestApp
 				{
 					ScheduleTime = DateTime.Now.AddMinutes(5)
 				},
-				Push = UrbanAirSharpGateway.CreatePush("Scheduled Push")
+				Push = new Push("Scheduled Push"),
 			};
 
 			Console.WriteLine("CREATE SCHEDULE:");

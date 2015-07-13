@@ -12,8 +12,8 @@ namespace UrbanAirSharp.Request
 	/// </summary>
 	public class ScheduleEditRequest : PutRequest<ScheduleEditResponse, Schedule>
 	{
-		public ScheduleEditRequest(Guid scheduleId, Schedule schedule) 
-			: base (schedule)
+		public ScheduleEditRequest(Guid scheduleId, Schedule schedule, ServiceModelConfig cfg)
+			: base (schedule, cfg)
 		{
 			RequestUrl = "api/schedules/" + scheduleId + "/";
 		}

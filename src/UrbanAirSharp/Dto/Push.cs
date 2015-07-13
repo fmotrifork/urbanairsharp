@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2014-2015 Jeff Gosling (jeffery.gosling@gmail.com)
 
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using UrbanAirSharp.Type;
@@ -23,47 +24,131 @@ namespace UrbanAirSharp.Dto
 	/// </summary>
 	public class Push
 	{
-		[JsonProperty("notification")]
-		public Notification Notification { get; set; }
+		#region CTOR & helpers
 
-		private Audience _audience;
-
-		[JsonProperty("audience")]
-		public object Audience
+		public Push(String alert, IEnumerable<BaseAlert> deviceAlerts = null)
 		{
-			get
-			{
-				if (_audience == null)
-				{
-					return "all";
-				}
+			Notification = new Notification { DefaultAlert = alert };
 
-				return _audience;
-			}
-			set
+			if (deviceAlerts != null && deviceAlerts.Count() > 0)
 			{
-				var audience = value as Audience;
-				_audience = audience;
+				Notification.AndroidAlert = deviceAlerts.FirstOrDefault(x => x is AndroidAlert) as AndroidAlert;
+				Notification.IosAlert = deviceAlerts.FirstOrDefault(x => x is IosAlert) as IosAlert;
+				Notification.WindowsAlert = deviceAlerts.FirstOrDefault(x => x is WindowsAlert) as WindowsAlert;
+				Notification.WindowsPhoneAlert = deviceAlerts.FirstOrDefault(x => x is WindowsPhoneAlert) as WindowsPhoneAlert;
+				Notification.BlackberryAlert = deviceAlerts.FirstOrDefault(x => x is BlackberryAlert) as BlackberryAlert;
 			}
 		}
 
-		private IList<DeviceType> _deviceTypes;
+		public Push(String alert, IAudience audience, IEnumerable<BaseAlert> deviceAlerts = null) 
+			: this(alert, deviceAlerts)
+		{
+			Audience = audience;			
+		}
 
-		[JsonProperty("device_types")]
-		public object DeviceTypes {
-			get 
+		public Push(String alert, Device device, IEnumerable<BaseAlert> deviceAlerts = null) 
+			: this(alert, new[] { device }, deviceAlerts) { }
+
+		public Push(String alert, IEnumerable<Device> devices, IEnumerable<BaseAlert> deviceAlerts = null)
+			: this(alert, CreteAudience(devices), deviceAlerts) { }
+
+		static IAudience CreteAudience(IEnumerable<Device> devices)
+		{
+			if (devices == null || devices.Count() == 0)
+				throw new ArgumentException("deviceAlerts can not be null or empty");
+
+			var audiences = new List<Audience>();
+			foreach (Device d in devices)
 			{
-				if (_deviceTypes == null)
-				{
-					return "all";
-				}
-					
-				return _deviceTypes;
+				if (d == null)
+					continue;
+
+				audiences.Add(MakeAudience(d.Id, d.Type));
 			}
-			set
+			return new AudienceOr { Audiences = audiences };
+		}
+
+		static Audience MakeAudience(String id, DeviceType dt)
+		{
+			switch(dt)
 			{
-				var list = value as IList<DeviceType>;
-				_deviceTypes = list;
+				case DeviceType.Android:
+					return new Audience(AudienceType.Android, id);
+				case DeviceType.Ios:
+					return new Audience(AudienceType.Ios, id);
+				case DeviceType.Wns:
+					return new Audience(AudienceType.Windows, id);
+				case DeviceType.Mpns:
+					return new Audience(AudienceType.WindowsPhone, id);
+				case DeviceType.Blackberry:
+					return new Audience(AudienceType.Blackberry, id);
+				default:
+					throw new ArgumentException("DeviceType dt " + dt + " is not currently supported");
+			}
+		}
+
+		#endregion
+
+		Notification _notify;
+
+		[JsonProperty("notification", Required = Required.Always)]
+		public virtual Notification Notification
+		{
+			get { return _notify; }
+			protected set
+			{
+				if (value == null)
+					throw new ArgumentNullException("Notification");
+
+				_notify = value;
+            }
+		}
+
+		//IAudience _audience;
+
+		[JsonIgnore]
+		public virtual IAudience Audience
+		{
+			get; set;
+		}
+
+		[JsonProperty("audience", NullValueHandling = NullValueHandling.Ignore)]
+		public virtual dynamic AllAudience
+		{
+			get
+			{
+				if (Audience == null)
+					return "all";
+				else
+					return Audience;
+			}
+		}
+
+		//IEnumerable<DeviceType> _deviceTypes;
+
+		[JsonIgnore]
+		public virtual IEnumerable<DeviceType> DeviceTypes
+		{
+			get; set;
+		}
+
+		//[JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
+		[JsonProperty("device_types", Required = Required.Always, NullValueHandling = NullValueHandling.Ignore)]
+		public virtual dynamic DeviceSet
+		{
+			get
+			{
+                IEnumerable<DeviceType> arr = DeviceTypes;
+                if (arr == null || arr.Count() == 0)
+                    arr = new[] { DeviceType.All };
+
+                string[] res = (from d in arr
+                                group d by d into dg
+                                select dg.Key.ToString().ToLower()).ToArray();
+                if (res.Length > 1)
+                    return res;
+                else
+                    return res.FirstOrDefault();
 			}
 		}
 
@@ -77,10 +162,5 @@ namespace UrbanAirSharp.Dto
 		//TODO: not implemented yet
 		[JsonProperty("message")]
 		public RichMessage RichMessage { get; private set; }
-
-		public void SetAudience(AudienceType audienceType, String value)
-		{
-			Audience = new Audience(audienceType, value);
-		}
 	}
 }

@@ -1,17 +1,16 @@
-﻿using System;
-using System.Reflection;
-using System.Runtime.InteropServices;
+﻿using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("UrbanAirSharp")]
-[assembly: AssemblyDescription("C# .Net library to simplify server-side calls to the Urban Airship API Version 3")]
+[assembly: AssemblyTitle("UrbanAirSharp.Tests")]
+[assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("UrbanAirSharp")]
-[assembly: AssemblyProduct("UrbanAirSharp")]
-[assembly: AssemblyCopyright("Copyright © Jeff Gosling (jeffery.gosling@gmail.com) 2014")]
+[assembly: AssemblyCompany("")]
+[assembly: AssemblyProduct("UrbanAirSharp.Tests")]
+[assembly: AssemblyCopyright("Copyright ©  2015")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -19,10 +18,9 @@ using System.Runtime.CompilerServices;
 // to COM components.  If you need to access a type in this assembly from 
 // COM, set the ComVisible attribute to true on that type.
 [assembly: ComVisible(false)]
-[assembly: InternalsVisibleTo("UrbanAirSharp.Tests")]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("e99d3143-1d57-40dd-8ff7-5cd8570e17f0")]
+[assembly: Guid("eec9281c-ed5f-42dd-a911-a3bf80f54b8e")]
 
 // Version information for an assembly consists of the following four values:
 //
@@ -34,5 +32,5 @@ using System.Runtime.CompilerServices;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.3.0.0")]
-[assembly: AssemblyFileVersion("1.3.0.0")]
+[assembly: AssemblyVersion("1.0.0.0")]
+[assembly: AssemblyFileVersion("1.0.0.0")]

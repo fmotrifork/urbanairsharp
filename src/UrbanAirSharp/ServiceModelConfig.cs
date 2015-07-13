@@ -4,32 +4,90 @@ using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
+using System.Configuration;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
 namespace UrbanAirSharp
 {
-	public static class ServiceModelConfig
+	/// <summary>
+	/// Configured http client and serializer
+	/// </summary>
+	public sealed class ServiceModelConfig
 	{
-		public static readonly String Host = "https://go.urbanairship.com/";
-		public static readonly HttpClient HttpClient = new HttpClient();
-		public static readonly JsonSerializerSettings SerializerSettings = new JsonSerializerSettings();
+		class Inner { internal static readonly ServiceModelConfig SINGLETON = Create(); }
+		/// <summary>
+		/// Lazy singleton instance handle
+		/// </summary>
+		public static ServiceModelConfig Instance { get { return Inner.SINGLETON; } } //lazy singleton pattern
+		
+		internal readonly String Host = "https://go.urbanairship.com/";
+		internal readonly HttpClient HttpClient = new HttpClient();
+		internal readonly JsonSerializerSettings SerializerSettings = new JsonSerializerSettings();
 
-		public static void Create(String uaAppKey, String uaAppMAsterSecret)
+		private ServiceModelConfig()
 		{
+			Host = GetConfigValue("UrbanAirSharp.host") ?? Host;
+        }
+
+		/// <summary>
+		/// Load the keys from config file or environment variables
+		/// </summary>
+		public static ServiceModelConfig Create()
+		{
+			string key = GetConfigValue("UrbanAirSharp.uaAppKey");
+			string secret = GetConfigValue("UrbanAirSharp.uaAppMAsterSecret");
+			return Create(key, secret);
+        }
+
+		internal static string GetConfigValue(string key)
+		{
+			if (string.IsNullOrWhiteSpace(key))
+				throw new ArgumentException("key can not be null or blank");
+
+            string v = ConfigurationManager.AppSettings[key];
+			if(string.IsNullOrEmpty(v))
+			{
+				v = Environment.GetEnvironmentVariable(key, EnvironmentVariableTarget.Process);
+				if (string.IsNullOrEmpty(v))
+				{
+					v = Environment.GetEnvironmentVariable(key, EnvironmentVariableTarget.User);
+					if (string.IsNullOrEmpty(v))
+						v = Environment.GetEnvironmentVariable(key, EnvironmentVariableTarget.Machine);
+				}
+			}
+			return string.IsNullOrEmpty(v) ? null : v;
+		}
+
+		/// <summary>
+		/// Explicitly provides keys
+		/// </summary>
+		/// <param name="uaAppKey">Required UA provided app key</param>
+		/// <param name="uaAppMAsterSecret">Required UA provided app secret</param>
+		public static ServiceModelConfig Create(String uaAppKey, String uaAppMAsterSecret)
+		{
+			if (string.IsNullOrEmpty(uaAppKey))
+				throw new ArgumentException("uaAppKey is required");
+			if (string.IsNullOrEmpty(uaAppMAsterSecret))
+				throw new ArgumentException("uaAppMAsterSecret is required");
+
 			var auth = String.Format("{0}:{1}", uaAppKey, uaAppMAsterSecret);
 			auth = Convert.ToBase64String(Encoding.ASCII.GetBytes(auth));
 
-			SerializerSettings.Converters.Add(new StringEnumConverter { CamelCaseText = true });
-			SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
-			SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Utc;
-			SerializerSettings.DateParseHandling = DateParseHandling.DateTime;
-			SerializerSettings.DateFormatHandling = DateFormatHandling.IsoDateFormat;
-			SerializerSettings.DateFormatString = "yyyy-MM-ddTH:mm:ss";
+			var cf = new ServiceModelConfig();
 
-			HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", auth);
-			HttpClient.DefaultRequestHeaders.TryAddWithoutValidation("Accept", "application/vnd.urbanairship+json; version=3;");
+			cf.SerializerSettings.Converters.Add(new StringEnumConverter { CamelCaseText = true });
+			cf.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
+			cf.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Utc;
+			cf.SerializerSettings.DateParseHandling = DateParseHandling.DateTime;
+			cf.SerializerSettings.DateFormatHandling = DateFormatHandling.IsoDateFormat;
+			cf.SerializerSettings.DateFormatString = "yyyy-MM-ddTH:mm:ss";
+
+			cf.HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", auth);
+			cf.HttpClient.DefaultRequestHeaders.TryAddWithoutValidation("Accept", "application/vnd.urbanairship+json; version=3;");
+
+			return cf;
 		}
 	}
 }

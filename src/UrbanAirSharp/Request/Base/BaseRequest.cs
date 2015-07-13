@@ -20,6 +20,10 @@ namespace UrbanAirSharp.Request.Base
 
 		protected static readonly ILog Log = LogManager.GetLogger(typeof(TResponse));
 
+		protected BaseRequest(ServiceModelConfig cfg) : this(cfg.Host, cfg.HttpClient, cfg.SerializerSettings)
+		{
+		}
+
 		protected BaseRequest(String host, HttpClient httpClient, JsonSerializerSettings serializerSettings)
 		{
 			Host = host;
@@ -34,8 +38,8 @@ namespace UrbanAirSharp.Request.Base
 
 		public virtual async Task<TResponse> ExecuteAsync()
 		{
-			return null;
-		}
+			return await new Task<TResponse>(() => null);
+        }
 
 		protected async Task<TResponse> DeserializeResponseAsync(HttpResponseMessage response)
 		{

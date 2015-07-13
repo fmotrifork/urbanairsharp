@@ -14,8 +14,8 @@ namespace UrbanAirSharp.Request.Base
 	/// </summary>
 	public class GetRequest<TResponse> : BaseRequest<TResponse> where TResponse : BaseResponse, new()
 	{
-		public GetRequest()
-			: base(ServiceModelConfig.Host, ServiceModelConfig.HttpClient, ServiceModelConfig.SerializerSettings)
+		public GetRequest(ServiceModelConfig cfg)
+			: base(cfg)
 		{
 			RequestMethod = HttpMethod.Get;
 		}
