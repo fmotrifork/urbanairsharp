@@ -28,7 +28,7 @@ namespace UrbanAirSharp
 
 		private ServiceModelConfig()
 		{
-			Host = GetConfigValue("host") ?? Host;
+			Host = GetConfigValue("UrbanAirSharp.host") ?? Host;
         }
 
 		/// <summary>
@@ -36,17 +36,16 @@ namespace UrbanAirSharp
 		/// </summary>
 		public static ServiceModelConfig Create()
 		{
-			string key = GetConfigValue("uaAppKey");
-			string secret = GetConfigValue("uaAppMAsterSecret");
+			string key = GetConfigValue("UrbanAirSharp.uaAppKey");
+			string secret = GetConfigValue("UrbanAirSharp.uaAppMAsterSecret");
 			return Create(key, secret);
         }
 
-		static string GetConfigValue(string key)
+		internal static string GetConfigValue(string key)
 		{
 			if (string.IsNullOrWhiteSpace(key))
 				throw new ArgumentException("key can not be null or blank");
 
-			key = "UrbanAirSharp." + key;
             string v = ConfigurationManager.AppSettings[key];
 			if(string.IsNullOrEmpty(v))
 			{
