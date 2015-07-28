@@ -57,8 +57,8 @@ namespace UrbanAirSharp
 		public UrbanAirSharpGateway() 
 			: this(ServiceModelConfig.Instance) { }
 		
-		public UrbanAirSharpGateway(String appKey, String appMasterSecret) 
-			: this(ServiceModelConfig.Create(appKey, appMasterSecret)) { }
+		public UrbanAirSharpGateway(String appKey, String appMasterSecret, String host = null) 
+			: this(ServiceModelConfig.Create(appKey, appMasterSecret, host)) { }
 
 		public UrbanAirSharpGateway(ServiceModelConfig cfg)
 		{
