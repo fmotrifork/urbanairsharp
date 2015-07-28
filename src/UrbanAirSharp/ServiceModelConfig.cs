@@ -26,9 +26,13 @@ namespace UrbanAirSharp
 		internal readonly HttpClient HttpClient = new HttpClient();
 		internal readonly JsonSerializerSettings SerializerSettings = new JsonSerializerSettings();
 
-		private ServiceModelConfig()
+		/// <param name="host">Optionally override the host url (to use with traffic inspector or proxy forwarder when debugging for example)</param>
+		private ServiceModelConfig(String host = null)
 		{
-			Host = GetConfigValue("UrbanAirSharp.host") ?? Host;
+			if (!string.IsNullOrWhiteSpace(host))
+				Host = host;
+			else
+				Host = GetConfigValue("UrbanAirSharp.host") ?? Host;
         }
 
 		/// <summary>
@@ -38,7 +42,8 @@ namespace UrbanAirSharp
 		{
 			string key = GetConfigValue("UrbanAirSharp.uaAppKey");
 			string secret = GetConfigValue("UrbanAirSharp.uaAppMAsterSecret");
-			return Create(key, secret);
+			string host = GetConfigValue("UrbanAirSharp.host");
+            return Create(key, secret, host);
         }
 
 		internal static string GetConfigValue(string key)
@@ -65,17 +70,18 @@ namespace UrbanAirSharp
 		/// </summary>
 		/// <param name="uaAppKey">Required UA provided app key</param>
 		/// <param name="uaAppMAsterSecret">Required UA provided app secret</param>
-		public static ServiceModelConfig Create(String uaAppKey, String uaAppMAsterSecret)
+		/// <param name="host">Optionally override the host url (to use with traffic inspector or proxy forwarder when debugging for example)</param>
+		public static ServiceModelConfig Create(String uaAppKey, String uaAppMAsterSecret, String host = null)
 		{
 			if (string.IsNullOrEmpty(uaAppKey))
 				throw new ArgumentException("uaAppKey is required");
 			if (string.IsNullOrEmpty(uaAppMAsterSecret))
 				throw new ArgumentException("uaAppMAsterSecret is required");
-
+			
 			var auth = String.Format("{0}:{1}", uaAppKey, uaAppMAsterSecret);
 			auth = Convert.ToBase64String(Encoding.ASCII.GetBytes(auth));
 
-			var cf = new ServiceModelConfig();
+			var cf = new ServiceModelConfig(host);
 
 			cf.SerializerSettings.Converters.Add(new StringEnumConverter { CamelCaseText = true });
 			cf.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
