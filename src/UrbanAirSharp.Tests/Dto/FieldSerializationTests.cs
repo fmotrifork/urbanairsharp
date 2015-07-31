@@ -14,15 +14,17 @@ using UrbanAirSharp.Type;
 namespace UrbanAirSharp.Tests.Dto
 {
     [TestFixture]
-    public class SerializationTests
+    public class FieldSerializationTests
     {
         static readonly JsonSerializerSettings _jss;
         
-        static SerializationTests()
+        static FieldSerializationTests()
         {
             _jss = ServiceModelConfig.Instance.SerializerSettings;
         }
 
+		[TestCaseSource("TagOperationTestValues")]
+		[TestCaseSource("ITagAudienceTestValues")]
 		[TestCaseSource("AudienceBuilderTestValues")]
 		[TestCaseSource("AudienceTestValues")]
         [TestCaseSource("PushTestValues")]
@@ -42,7 +44,9 @@ namespace UrbanAirSharp.Tests.Dto
             Assert.AreEqual(expected, jsonVal);
         }
 
-        public static IEnumerable<TestCaseData> PushTestValues
+		#region test data generator
+
+		public static IEnumerable<TestCaseData> PushTestValues
         {
             get
             {
@@ -65,7 +69,9 @@ namespace UrbanAirSharp.Tests.Dto
 			get
 			{
 				yield return new TestCaseData(new Audience(AudienceType.Ios, "ioskey"), "device_token", "ioskey");
+				yield return new TestCaseData(new Audience(AudienceType.Ios, "ioschannel1", true), "ios_channel", "ioschannel1");
 				yield return new TestCaseData(new Audience(AudienceType.Android, "blah"), "apid", "blah");
+				yield return new TestCaseData(new Audience(AudienceType.Android, "blah2", true), "android_channel", "blah2");
 				yield return new TestCaseData(new Audience(AudienceType.Windows, "zzz"), "wns", "zzz");
 				yield return new TestCaseData(new Audience(AudienceType.Blackberry, "1234"), "device_pin", "1234");
 				yield return new TestCaseData(new Audience(AudienceType.Segment, "!!!"), "segment", "!!!");
@@ -98,6 +104,56 @@ namespace UrbanAirSharp.Tests.Dto
 				yield return new TestCaseData(android.And(tag).Not(), "NOT", android & tag);
 			}
 		}
+
+		public static IEnumerable<TestCaseData> ITagAudienceTestValues
+		{
+			get
+			{
+				var ta = new TagAudience
+				{
+					AmazonChannel = Guid.NewGuid().ToString(),
+					AndroidChannel = Guid.NewGuid().ToString(),
+					IosChannel = Guid.NewGuid().ToString(),
+				};
+				yield return new TestCaseData(ta, "amazon_channel", ta.AmazonChannel);
+				yield return new TestCaseData(ta, "android_channel", ta.AndroidChannel);
+				yield return new TestCaseData(ta, "ios_channel", ta.IosChannel);
+
+				var tab = new TagAudienceBatch
+				{
+					AmazonChannels = new[] { Guid.NewGuid().ToString(), DateTime.UtcNow.ToString() },
+					AndroidChannels = new[] { Guid.NewGuid().ToString(), DateTime.UtcNow.ToString() },
+					IosChannels = new[] { Guid.NewGuid().ToString(), DateTime.UtcNow.ToString() },
+				};
+				yield return new TestCaseData(tab, "amazon_channel", tab.AmazonChannels);
+				yield return new TestCaseData(tab, "android_channel", tab.AndroidChannels);
+				yield return new TestCaseData(tab, "ios_channel", tab.IosChannels);
+			}
+		}
+
+		public static IEnumerable<TestCaseData> TagOperationTestValues
+		{
+			get
+			{
+				var ta = new TagAudience
+				{
+					AmazonChannel = Guid.NewGuid().ToString(),
+					AndroidChannel = Guid.NewGuid().ToString(),
+					IosChannel = Guid.NewGuid().ToString(),
+				};
+				yield return new TestCaseData(new TagOperation(ta), "audience", ta);
+
+				var tab = new TagAudienceBatch
+				{
+					AmazonChannels = new[] { Guid.NewGuid().ToString(), DateTime.UtcNow.ToString() },
+					AndroidChannels = new[] { Guid.NewGuid().ToString(), DateTime.UtcNow.ToString() },
+					IosChannels = new[] { Guid.NewGuid().ToString(), DateTime.UtcNow.ToString() },
+				};
+				yield return new TestCaseData(new TagOperation(tab), "audience", tab);
+			}
+		}
+
+		#endregion
 
 	}
 }

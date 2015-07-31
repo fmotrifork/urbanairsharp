@@ -180,6 +180,8 @@ namespace UrbanAirSharp
             return SendRequest(request);
 		}
 
+		/// <see cref="http://docs.urbanairship.com/api/ua.html#tags"/>
+		[Obsolete("Please use the channel based tag creation.  This method will be deprecated in the next UA. API release.", false)]
 		public BaseResponse CreateTag(Tag tag)
 		{
 			if (string.IsNullOrEmpty(tag.TagName))
@@ -189,6 +191,8 @@ namespace UrbanAirSharp
             return SendRequest(request);
 		}
 
+		/// <see cref="http://docs.urbanairship.com/api/ua.html#tags"/>
+		[Obsolete("Please use the channel based tag creation.  This method will be deprecated in the next UA. API release.", false)]
 		public BaseResponse DeleteTag(string tag)
 		{
 			if (string.IsNullOrEmpty(tag))
@@ -198,10 +202,29 @@ namespace UrbanAirSharp
             return SendRequest(request);
 		}
 
+		/// <see cref="http://docs.urbanairship.com/api/ua.html#tags"/>
+		[Obsolete("Please use the channel based tag creation.  This method will be deprecated in the next UA. API release.", false)]
 		public TagListResponse ListTags()
 		{
 			var request = new TagListRequest(_cfg);
             return SendRequest(request);
+		}
+
+		public ChannelResponse Channel(string channelId)
+		{
+			var request = new ChannelRequest(channelId, _cfg);
+			return SendRequest(request);
+		}
+
+		/// <summary>
+		/// Manipulate tags using channel ids
+		/// </summary>
+		/// <param name="operations">operation instruction</param>
+		/// <returns>standard response</returns>
+		public BaseResponse ChannelTags(TagOperation operations)
+		{
+			var request = new ChannelTagRequest(operations, _cfg);
+			return SendRequest(request);
 		}
 
 		static TResponse SendRequest<TResponse>(BaseRequest<TResponse> request) where TResponse : BaseResponse, new()

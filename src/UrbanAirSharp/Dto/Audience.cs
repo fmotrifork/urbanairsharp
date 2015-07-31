@@ -12,11 +12,23 @@ namespace UrbanAirSharp.Dto
 	/// </summary>
 	public class Audience : AudienceBase, IAudience
 	{
+		/// <summary>
+		/// apid
+		/// </summary>
 		[JsonProperty("apid")]
 		public String AndroidDeviceId { get; private set; }
 
+		[JsonProperty("android_channel")]
+		public string AndroidChannel { get; private set; }
+
+		/// <summary>
+		/// Device token
+		/// </summary>
 		[JsonProperty("device_token")]
 		public String IosDeviceId { get; private set; }
+
+		[JsonProperty("ios_channel")]
+		public string IosChannel { get; private set; }
 
 		[JsonProperty("wns")]
 		public String WindowsId { get; private set; }
@@ -36,15 +48,21 @@ namespace UrbanAirSharp.Dto
 		[JsonProperty("tag")]
 		public String Tag { get; private set; }
 
-		public Audience(AudienceType type, String value)
+		public Audience(AudienceType type, string value, bool isChannel = false)
 		{
 			switch (type)
 			{
 				case AudienceType.Android:
-					AndroidDeviceId = value;
+					if (isChannel)
+						AndroidChannel = value;
+					else
+						AndroidDeviceId = value;
 					break;
 				case AudienceType.Ios:
-					IosDeviceId = value;
+					if (isChannel)
+						IosChannel = value;
+					else
+						IosDeviceId = value;
 					break;
 				case AudienceType.Windows:
 					WindowsId = value;

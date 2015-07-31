@@ -49,7 +49,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Dto\SerializationTests.cs" />
+    <Compile Include="Dto\FieldSerializationTests.cs" />
+    <Compile Include="Dto\ObjectDeserializationTests.cs" />
     <Compile Include="Ignores\PushCRUD.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

@@ -68,14 +68,14 @@ namespace UrbanAirSharp.Dto
 			return new AudienceOr { Audiences = audiences };
 		}
 
-		static Audience MakeAudience(String id, DeviceType dt)
+		static Audience MakeAudience(String id, DeviceType dt, bool isChannel = false)
 		{
 			switch(dt)
 			{
 				case DeviceType.Android:
-					return new Audience(AudienceType.Android, id);
+					return new Audience(AudienceType.Android, id, isChannel);
 				case DeviceType.Ios:
-					return new Audience(AudienceType.Ios, id);
+					return new Audience(AudienceType.Ios, id, isChannel);
 				case DeviceType.Wns:
 					return new Audience(AudienceType.Windows, id);
 				case DeviceType.Mpns:
