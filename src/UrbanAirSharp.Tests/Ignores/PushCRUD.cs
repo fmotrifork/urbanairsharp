@@ -16,6 +16,7 @@ namespace UrbanAirSharp.Tests.Ignores
 	public class PushCRUD
 	{
 		readonly Regex DEV_TK = new Regex(@"^[a-f0-9]{64}$", RegexOptions.IgnoreCase);
+		readonly Regex CHL_TK = new Regex(@"^[a-f0-9\-]{32,48}$", RegexOptions.IgnoreCase);
 		readonly UrbanAirSharpGateway _ua;
 
 		public PushCRUD()
@@ -23,8 +24,8 @@ namespace UrbanAirSharp.Tests.Ignores
 			_ua = new UrbanAirSharpGateway();
 		}
 
-		[TestCase("Hello From UrbanAirship!", "My.DeviceToken")]
-		public void Push(string message, string iosDeviceToken)
+		[TestCase("DeviceToken Push Test from UrbanAirSharp UnitTest", @"F1F0EA5D64313623203333CD38D4D1D08BBA19DF2F18209590267E28A83B5F8E")]
+		public void PushToken(string message, string iosDeviceToken)
 		{
 			Assert.That(!string.IsNullOrWhiteSpace(message));
 			Assert.That(!string.IsNullOrWhiteSpace(iosDeviceToken));
@@ -37,13 +38,42 @@ namespace UrbanAirSharp.Tests.Ignores
 			}
 
 			var p = new Push(message, new Audience(Type.AudienceType.Ios, iosDeviceToken));
-			PushResponse r = _ua.Push(p);
+			PushResponse pv = _ua.Validate(p);
+			TestResponse(pv);
 
+			PushResponse pr = _ua.Push(p);
+			TestResponse(pr);
+			CollectionAssert.IsNotEmpty(pr.PushIds);
+		}
+
+		void TestResponse(BaseResponse r)
+		{
 			Assert.IsNotNull(r);
 			Assert.That(string.IsNullOrEmpty(r.Error), r.Error);
 			Assert.LessOrEqual(r.ErrorCode, 0);
 			Assert.IsTrue(r.Ok);
-			CollectionAssert.IsNotEmpty(r.PushIds);
-        }
+		}
+
+		[TestCase("Channel Push Test from UrbainAirSharp UnitTest", @"a1e4ae13-7595-454c-bf96-e85b38ab265b")]
+        public void PushChannel(string message, string channelId)
+		{
+			Assert.That(!string.IsNullOrWhiteSpace(message));
+			Assert.That(!string.IsNullOrWhiteSpace(channelId));
+
+			if (!CHL_TK.IsMatch(channelId))
+			{
+				string ch = ServiceModelConfig.GetConfigValue(channelId);
+				Assert.That(CHL_TK.IsMatch(ch), "Invalid UA Channel Id: {0} => {1}", channelId, ch);
+				channelId = ch;
+			}
+
+			var p = new Push(message, new Audience(Type.AudienceType.Ios, channelId, true));
+			PushResponse pv = _ua.Validate(p);
+			TestResponse(pv);
+
+			PushResponse pr = _ua.Push(p);
+			TestResponse(pr);
+			CollectionAssert.IsNotEmpty(pr.PushIds);
+		}
 	}
 }
