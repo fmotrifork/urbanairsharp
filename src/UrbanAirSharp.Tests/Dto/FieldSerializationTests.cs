@@ -37,11 +37,16 @@ namespace UrbanAirSharp.Tests.Dto
             Assert.IsNotNull(jo);
 
             JToken tk = jo.SelectToken("$." + field);
-            Assert.IsNotNull(tk);
+			if (expectedValue == null)
+				Assert.IsNull(tk);
+			else
+			{
+				Assert.IsNotNull(tk);
 
-            string jsonVal = tk.ToString(Formatting.None, _jss.Converters.ToArray());
-            string expected = JsonConvert.SerializeObject(expectedValue, _jss);
-            Assert.AreEqual(expected, jsonVal);
+				string jsonVal = tk.ToString(Formatting.None, _jss.Converters.ToArray());
+				string expected = JsonConvert.SerializeObject(expectedValue, _jss);
+				Assert.AreEqual(expected, jsonVal);
+			}
         }
 
 		#region test data generator
@@ -68,10 +73,22 @@ namespace UrbanAirSharp.Tests.Dto
 		{
 			get
 			{
-				yield return new TestCaseData(new Audience(AudienceType.Ios, "ioskey"), "device_token", "ioskey");
-				yield return new TestCaseData(new Audience(AudienceType.Ios, "ioschannel1", true), "ios_channel", "ioschannel1");
-				yield return new TestCaseData(new Audience(AudienceType.Android, "blah"), "apid", "blah");
-				yield return new TestCaseData(new Audience(AudienceType.Android, "blah2", true), "android_channel", "blah2");
+				var ios1 = new Audience(AudienceType.Ios, "ioskey");
+                yield return new TestCaseData(ios1, "device_token", "ioskey");
+				yield return new TestCaseData(ios1, "ios_channel", null);
+
+				var ios2 = new Audience(AudienceType.Ios, "ioschannel1", true);
+                yield return new TestCaseData(ios2, "ios_channel", "ioschannel1");
+				yield return new TestCaseData(ios2, "device_token", null);
+
+				var android1 = new Audience(AudienceType.Android, "blah");
+                yield return new TestCaseData(android1, "apid", "blah");
+				yield return new TestCaseData(android1, "android_channel", null);
+
+				var android2 = new Audience(AudienceType.Android, "blah2", true);
+                yield return new TestCaseData(android2, "android_channel", "blah2");
+				yield return new TestCaseData(android2, "apid", null);
+
 				yield return new TestCaseData(new Audience(AudienceType.Windows, "zzz"), "wns", "zzz");
 				yield return new TestCaseData(new Audience(AudienceType.Blackberry, "1234"), "device_pin", "1234");
 				yield return new TestCaseData(new Audience(AudienceType.Segment, "!!!"), "segment", "!!!");

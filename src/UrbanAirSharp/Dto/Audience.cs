@@ -15,37 +15,37 @@ namespace UrbanAirSharp.Dto
 		/// <summary>
 		/// apid
 		/// </summary>
-		[JsonProperty("apid")]
+		[JsonProperty("apid", DefaultValueHandling = DefaultValueHandling.Ignore)]
 		public String AndroidDeviceId { get; private set; }
 
-		[JsonProperty("android_channel")]
+		[JsonProperty("android_channel", DefaultValueHandling = DefaultValueHandling.Ignore)]
 		public string AndroidChannel { get; private set; }
 
 		/// <summary>
 		/// Device token
 		/// </summary>
-		[JsonProperty("device_token")]
+		[JsonProperty("device_token", DefaultValueHandling = DefaultValueHandling.Ignore)]
 		public String IosDeviceId { get; private set; }
 
-		[JsonProperty("ios_channel")]
+		[JsonProperty("ios_channel", DefaultValueHandling = DefaultValueHandling.Ignore)]
 		public string IosChannel { get; private set; }
 
-		[JsonProperty("wns")]
+		[JsonProperty("wns", DefaultValueHandling = DefaultValueHandling.Ignore)]
 		public String WindowsId { get; private set; }
 
-		[JsonProperty("mpns")]
+		[JsonProperty("mpns", DefaultValueHandling = DefaultValueHandling.Ignore)]
 		public String WindowsPhoneId { get; private set; }
 
-		[JsonProperty("device_pin")]
+		[JsonProperty("device_pin", DefaultValueHandling = DefaultValueHandling.Ignore)]
 		public String BlackberryId { get; private set; }
 
-		[JsonProperty("segment")]
+		[JsonProperty("segment", DefaultValueHandling = DefaultValueHandling.Ignore)]
 		public String SegmentId { get; private set; }
 
-		[JsonProperty("alias")]
+		[JsonProperty("alias", DefaultValueHandling = DefaultValueHandling.Ignore)]
 		public String Alias { get; private set; }
 
-		[JsonProperty("tag")]
+		[JsonProperty("tag", DefaultValueHandling = DefaultValueHandling.Ignore)]
 		public String Tag { get; private set; }
 
 		public Audience(AudienceType type, string value, bool isChannel = false)

@@ -85,6 +85,7 @@ namespace UrbanAirSharp
 
 			cf.SerializerSettings.Converters.Add(new StringEnumConverter { CamelCaseText = true });
 			cf.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
+			//cf.SerializerSettings.DefaultValueHandling = DefaultValueHandling.Ignore;
 			cf.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Utc;
 			cf.SerializerSettings.DateParseHandling = DateParseHandling.DateTime;
 			cf.SerializerSettings.DateFormatHandling = DateFormatHandling.IsoDateFormat;
