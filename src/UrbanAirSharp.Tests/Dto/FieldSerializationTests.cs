@@ -158,7 +158,9 @@ namespace UrbanAirSharp.Tests.Dto
 					AndroidChannel = Guid.NewGuid().ToString(),
 					IosChannel = Guid.NewGuid().ToString(),
 				};
-				yield return new TestCaseData(new TagOperation(ta), "audience", ta);
+				yield return new TestCaseData(new TagSet(ta), "audience", ta);
+				yield return new TestCaseData(new TagAddRemove(ta), "audience", ta);
+
 
 				var tab = new TagAudienceBatch
 				{
@@ -166,7 +168,12 @@ namespace UrbanAirSharp.Tests.Dto
 					AndroidChannels = new[] { Guid.NewGuid().ToString(), DateTime.UtcNow.ToString() },
 					IosChannels = new[] { Guid.NewGuid().ToString(), DateTime.UtcNow.ToString() },
 				};
-				yield return new TestCaseData(new TagOperation(tab), "audience", tab);
+				var op = new TagAddRemove(tab) { Add = new Dictionary<string, ICollection<string>> { { "blah", new[] { "test" } } } };
+                yield return new TestCaseData(op, "audience", tab);
+				yield return new TestCaseData(op, "set", null);
+				//yield return new TestCaseData(op, "remove", null);
+				
+				yield return new TestCaseData(op, "add.blah[0]", "test");
 			}
 		}
 

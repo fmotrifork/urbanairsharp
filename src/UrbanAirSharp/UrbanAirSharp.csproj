@@ -79,9 +79,11 @@
     <Compile Include="Dto\ScheduleInfo.cs" />
     <Compile Include="Dto\Schedule.cs" />
     <Compile Include="Dto\Tag.cs" />
+    <Compile Include="Dto\TagAddRemove.cs" />
     <Compile Include="Dto\TagAudience.cs" />
     <Compile Include="Dto\TagAudienceBatch.cs" />
     <Compile Include="Dto\TagOperation.cs" />
+    <Compile Include="Dto\TagSet.cs" />
     <Compile Include="Dto\WindowsAlert.cs" />
     <Compile Include="Dto\WindowsPhoneAlert.cs" />
     <Compile Include="Request\Base\DeleteRequest.cs" />
