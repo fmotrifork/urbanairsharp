@@ -9,9 +9,11 @@ namespace UrbanAirSharp.Dto
 {
 	public class TagAddRemove : TagOperation
 	{
-		public TagAddRemove(ITagAudience audience) : base(audience)
+		public TagAddRemove(TagAudience audience) : base(audience)
 		{
-
+		}
+		public TagAddRemove(TagAudienceBatch audience) : base(audience)
+		{
 		}
 
 		readonly Dictionary<string, ICollection<string>> _add = new Dictionary<string, ICollection<string>>();
