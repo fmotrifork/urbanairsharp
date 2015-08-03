@@ -9,7 +9,8 @@ namespace UrbanAirSharp.Dto
 {
 	public class TagSet : TagOperation
 	{
-		public TagSet(ITagAudience audience) : base(audience) { }
+		public TagSet(TagAudience audience) : base(audience) { }
+		public TagSet(TagAudienceBatch audience) : base(audience) { }
 
 		readonly Dictionary<string, ICollection<string>> _set = new Dictionary<string, ICollection<string>>();
 		[JsonProperty("set")]
