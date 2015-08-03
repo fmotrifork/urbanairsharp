@@ -7,7 +7,7 @@ using Newtonsoft.Json;
 
 namespace UrbanAirSharp.Dto
 {
-	public class TagOperation
+	public abstract class TagOperation
 	{
 		public TagOperation(ITagAudience audience)
 		{
@@ -28,25 +28,5 @@ namespace UrbanAirSharp.Dto
 			}
 		}
 
-		readonly Dictionary<string, ICollection<string>> _add = new Dictionary<string, ICollection<string>>();
-		[JsonProperty("add")]
-		public IDictionary<string, ICollection<string>> Add
-		{
-			get { return _add; }
-		}
-
-		readonly Dictionary<string, ICollection<string>> _remove = new Dictionary<string, ICollection<string>>();
-		[JsonProperty("remove")]
-		public IDictionary<string, ICollection<string>> Remove
-		{
-			get { return _remove; }
-		}
-
-		readonly Dictionary<string, ICollection<string>> _set = new Dictionary<string, ICollection<string>>();
-		[JsonProperty("set")]
-		public IDictionary<string, ICollection<string>> Set
-		{
-			get { return _set; }
-		}
 	}
 }

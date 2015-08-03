@@ -221,7 +221,18 @@ namespace UrbanAirSharp
 		/// </summary>
 		/// <param name="operations">operation instruction</param>
 		/// <returns>standard response</returns>
-		public BaseResponse ChannelTags(TagOperation operations)
+		public BaseResponse ChannelTags(TagAddRemove operations)
+		{
+			var request = new ChannelTagRequest(operations, _cfg);
+			return SendRequest(request);
+		}
+
+		/// <summary>
+		/// Manipulate tags using channel ids
+		/// </summary>
+		/// <param name="operations">operation instruction</param>
+		/// <returns>standard response</returns>
+		public BaseResponse ChannelTags(TagSet operations)
 		{
 			var request = new ChannelTagRequest(operations, _cfg);
 			return SendRequest(request);
