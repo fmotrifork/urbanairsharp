@@ -7,7 +7,7 @@ namespace UrbanAirSharp.Dto
 	public class Notification
 	{
 		string _default;
-		[JsonProperty("alert", Required = Required.Always)]
+		[JsonProperty("alert", NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore)]
 		public String DefaultAlert
 		{
 			get { return _default; }

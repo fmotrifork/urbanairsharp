@@ -35,7 +35,7 @@ namespace TestApp
 			Console.WriteLine("================ TESTING VALIDATE ================");
 			Console.WriteLine();
 
-			var response = _urbanAirSharpGateway.Validate(new Push("Validate push", new Device(TestDeviceGuid, DeviceType.Android)));
+			var response = _urbanAirSharpGateway.Validate(new Push(new Device(TestDeviceGuid, DeviceType.Android), "Validate push"));
 
 			Console.Write(response.HttpResponseCode + " - ");
 			Console.WriteLine(response.Ok ? "SUCCESS" : "FAILED");
@@ -60,7 +60,7 @@ namespace TestApp
 			Console.WriteLine();
 
 			Console.WriteLine("PUSH Targeted Alert to device");
-			response = _urbanAirSharpGateway.Push(new Push("Targeted Alert to device", new Device("android-id-blah-blah", DeviceType.Android)));
+			response = _urbanAirSharpGateway.Push(new Push(new Device("android-id-blah-blah", DeviceType.Android), "Targeted Alert to device"));
             Console.Write(response.HttpResponseCode + " - ");
 			Console.WriteLine(response.Ok ? "SUCCESS" : "FAILED");
 			Console.WriteLine();
@@ -93,7 +93,7 @@ namespace TestApp
 			var customAudience2 = rugbyFanAudience & fansAudience & !newZealandAudience & !englishAudience;
 
 			Console.WriteLine("PUSH to custom Audience");
-			response = _urbanAirSharpGateway.Push(new Push("Rugby fans that's not English or New Zellanders", customAudience));
+			response = _urbanAirSharpGateway.Push(new Push(customAudience, "Rugby fans that's not English or NewZealanders"));
 
 			Console.Write(response.HttpResponseCode + " - ");
 			Console.WriteLine(response.Ok ? "SUCCESS" : "FAILED");
@@ -157,7 +157,7 @@ namespace TestApp
 			var moreAudience = new AudienceAnd { Audiences = new[] { new Audience(AudienceType.Tag, ""), new Audience(AudienceType.Tag, "") } };
 			compoundAudience &= moreAudience;
 
-			var message = new Push("What's up", compoundAudience);
+			var message = new Push(compoundAudience, "What's up");
 
 			client.Push(new Push("Custom Android Alert per device type", new[]
 			{

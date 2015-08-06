@@ -24,10 +24,12 @@ namespace UrbanAirSharp.Tests.Ignores
 			_ua = new UrbanAirSharpGateway();
 		}
 
-		[TestCase("DeviceToken Push Test from UrbanAirSharp UnitTest", @"F1F0EA5D64313623203333CD38D4D1D08BBA19DF2F18209590267E28A83B5F8E")]
-		public void PushToken(string message, string iosDeviceToken)
+		
+		[TestCase("DeviceToken Push Test from UrbanAirSharp UnitTest", @"F1F0EA5D64313623203333CD38D4D1D08BBA19DF2F18209590267E28A83B5F8E", "+1")]
+		[TestCase("", @"F1F0EA5D64313623203333CD38D4D1D08BBA19DF2F18209590267E28A83B5F8E", 0)]
+		public void PushToken(string message, string iosDeviceToken, IComparable badge)
 		{
-			Assert.That(!string.IsNullOrWhiteSpace(message));
+			//Assert.That(!string.IsNullOrWhiteSpace(message));
 			Assert.That(!string.IsNullOrWhiteSpace(iosDeviceToken));
 
 			if (!DEV_TK.IsMatch(iosDeviceToken))
@@ -37,7 +39,9 @@ namespace UrbanAirSharp.Tests.Ignores
 				iosDeviceToken = tk;
 			}
 
-			var p = new Push(message, new Audience(Type.AudienceType.Ios, iosDeviceToken));
+			var p = new Push(new Audience(Type.AudienceType.Ios, iosDeviceToken), message);
+			p.Notification.IosAlert = new IosAlert { Badge = badge };
+
 			PushResponse pv = _ua.Validate(p);
 			TestResponse(pv);
 
@@ -53,11 +57,12 @@ namespace UrbanAirSharp.Tests.Ignores
 			Assert.LessOrEqual(r.ErrorCode, 0);
 			Assert.IsTrue(r.Ok);
 		}
-
-		[TestCase("Channel Push Test from UrbainAirSharp UnitTest", @"a1e4ae13-7595-454c-bf96-e85b38ab265b")]
-        public void PushChannel(string message, string channelId)
+		
+		[TestCase("Channel Push Test from UrbainAirSharp UnitTest", @"a1e4ae13-7595-454c-bf96-e85b38ab265b", "+1")]
+		[TestCase("", @"a1e4ae13-7595-454c-bf96-e85b38ab265b", 0)]
+		public void PushChannel(string message, string channelId, IComparable badge)
 		{
-			Assert.That(!string.IsNullOrWhiteSpace(message));
+			//Assert.That(!string.IsNullOrWhiteSpace(message));
 			Assert.That(!string.IsNullOrWhiteSpace(channelId));
 
 			if (!CHL_TK.IsMatch(channelId))
@@ -67,7 +72,9 @@ namespace UrbanAirSharp.Tests.Ignores
 				channelId = ch;
 			}
 
-			var p = new Push(message, new Audience(Type.AudienceType.Ios, channelId, true));
+			var p = new Push(new Audience(Type.AudienceType.Ios, channelId, true), message);
+			p.Notification.IosAlert = new IosAlert { Badge = badge };
+
 			PushResponse pv = _ua.Validate(p);
 			TestResponse(pv);
 

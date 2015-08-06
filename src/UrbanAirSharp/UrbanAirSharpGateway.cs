@@ -88,11 +88,11 @@ namespace UrbanAirSharp
 		{
 			Push content = null;
 			if (customAudience != null)
-				content = new Push(alert, customAudience, deviceAlerts);
+				content = new Push(customAudience, alert, deviceAlerts);
 			else if (deviceTypes != null && !string.IsNullOrWhiteSpace(deviceId))
 			{
 				IEnumerable<Device> devices = from dt in deviceTypes select new Device(deviceId, dt);
-				content = new Push(alert, devices, deviceAlerts);
+				content = new Push(devices, alert, deviceAlerts);
 			}
 			return content;
 		}
