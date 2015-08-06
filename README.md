@@ -39,6 +39,14 @@ var message = new Push("What's up", myPhone);
 client.Push(message);
 ```
 
+Alternatively, you can push using UA's proprietary ChannelID introduced in v3 of their API instead of direct device id like so:
+```csharp
+var client = new UrbanAirSharpGateway(AppKey, AppMasterSecret);
+var myPhone = new Device("ua-channel-id", DeviceType.Ios, true);
+var message = new Push("What's up", myPhone);
+client.Push(message);
+```
+
 Note that you can store the keys in your web config or environment variables and use the default constructor to instanciate clients like so:
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
@@ -89,15 +97,16 @@ client.Push(new Push("Broadcast Alert")); //push to everyone
 
 client.Push(new Push("Push to all Androids") { DeviceTypes = new[] { DeviceType.Android } });
 
-client.Push(new Push("Every device own by a User", 
+client.Push(new Push(
 				new Audience(AudienceType.Ios, "iphone-6-abc") |
 				new Audience(AudienceType.Ios, "ipad-1-xyz") |
-				new Audience(AudienceType.Windows, "workstation-123")));
+				new Audience(AudienceType.Windows, "workstation-123"),
+				"Every device own by a User"));
 ```
 
 This is an example of a more complicated, audience targeted Push
 ```csharp
-client.Push(new Push("Custom Android Alert per device type", new[]
+client.Push(new Push(new[]
 {
 	new AndroidAlert()
 	{
@@ -106,7 +115,7 @@ client.Push(new Push("Custom Android Alert per device type", new[]
 		DelayWhileIdle = true,
 		GcmTimeToLive = 5
 	}
-}));
+}, "Custom Android Alert per device type"));
 ```
 
 # License

@@ -26,9 +26,10 @@ namespace UrbanAirSharp.Dto
 	{
 		#region CTOR & helpers
 
-		public Push(String alert, IEnumerable<BaseAlert> deviceAlerts = null)
+		public Push(String alert = null, IEnumerable<BaseAlert> deviceAlerts = null)
 		{
-			Notification = new Notification { DefaultAlert = alert };
+			if(!string.IsNullOrEmpty(alert))
+				 Notification.DefaultAlert = alert;
 
 			if (deviceAlerts != null && deviceAlerts.Count() > 0)
 			{
@@ -40,17 +41,17 @@ namespace UrbanAirSharp.Dto
 			}
 		}
 
-		public Push(String alert, IAudience audience, IEnumerable<BaseAlert> deviceAlerts = null) 
+		public Push(IAudience audience, String alert = null, IEnumerable<BaseAlert> deviceAlerts = null) 
 			: this(alert, deviceAlerts)
 		{
 			Audience = audience;			
 		}
 
-		public Push(String alert, Device device, IEnumerable<BaseAlert> deviceAlerts = null) 
-			: this(alert, new[] { device }, deviceAlerts) { }
+		public Push(Device device, String alert = null, IEnumerable<BaseAlert> deviceAlerts = null) 
+			: this(new[] { device }, alert, deviceAlerts) { }
 
-		public Push(String alert, IEnumerable<Device> devices, IEnumerable<BaseAlert> deviceAlerts = null)
-			: this(alert, CreteAudience(devices), deviceAlerts) { }
+		public Push(IEnumerable<Device> devices, String alert = null, IEnumerable<BaseAlert> deviceAlerts = null)
+			: this(CreteAudience(devices), alert, deviceAlerts) { }
 
 		static IAudience CreteAudience(IEnumerable<Device> devices)
 		{
@@ -89,7 +90,7 @@ namespace UrbanAirSharp.Dto
 
 		#endregion
 
-		Notification _notify;
+		Notification _notify = new Notification();
 
 		[JsonProperty("notification", Required = Required.Always)]
 		public virtual Notification Notification

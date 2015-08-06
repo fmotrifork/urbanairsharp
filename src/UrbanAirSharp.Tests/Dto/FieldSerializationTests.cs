@@ -65,7 +65,7 @@ namespace UrbanAirSharp.Tests.Dto
                 yield return new TestCaseData(new Push("ios") { DeviceTypes = new[] { DeviceType.Ios } }, "device_types", "ios");
 
 				var au = new Audience(AudienceType.Tag, "test");
-				yield return new TestCaseData(new Push("blah", au), "audience", au);
+				yield return new TestCaseData(new Push(au, "blah"), "audience", au);
             }
         }
 
