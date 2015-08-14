@@ -16,7 +16,7 @@ namespace UrbanAirSharp.Request
 			if (content == null)
 				throw new ArgumentNullException("content");
 
-			RequestUrl = "/api/channels/tags/";
+			RequestUrl = "api/channels/tags/";
         }
 	}
 }
