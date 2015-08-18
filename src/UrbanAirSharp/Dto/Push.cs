@@ -158,10 +158,10 @@ namespace UrbanAirSharp.Dto
 
 		//TODO: not implemented yet
 		[JsonProperty("actions")]
-		public Actions Actions { get; private set; }
+		public Actions Actions { get; set; }
 
 		//TODO: not implemented yet
 		[JsonProperty("message")]
-		public RichMessage RichMessage { get; private set; }
+		public RichMessage RichMessage { get; set; }
 	}
 }
