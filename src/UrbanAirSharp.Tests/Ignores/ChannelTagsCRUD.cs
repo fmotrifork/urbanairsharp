@@ -36,25 +36,25 @@ namespace UrbanAirSharp.Tests.Ignores
 		const string TAG_GROUP = "unit_test";
 
 		[TestFixtureSetUp]
-		public void T00_Clean()
+		public async Task T00_Clean()
 		{
-			var resp = _ua.Channel(_ta.IosChannel);
+			var resp = await _ua.Channel(_ta.IosChannel);
 			OpTest(resp);
 			Assert.IsNotNull(resp.Channel);
 			if(resp.Channel.TagGroups != null && resp.Channel.TagGroups.ContainsKey(TAG_GROUP))
 			{
 				var op = new TagSet(_ta);
 				op.Set.Add(TAG_GROUP, new string[0]);
-				OpTest(_ua.ChannelTags(op));
+				OpTest(await _ua.ChannelTags(op));
 			}
 		}
 
 		[Test]
-		public void T01_Create()
+		public async Task T01_Create()
 		{
 			var to = new TagAddRemove(_ta);
 			to.Add.Add(TAG_GROUP, new[] { _remlist.First() });
-			OpTest(_ua.ChannelTags(to));
+			OpTest(await _ua.ChannelTags(to));
 		}
 
 		void OpTest(BaseResponse resp)
@@ -64,10 +64,10 @@ namespace UrbanAirSharp.Tests.Ignores
 		}
 
 		[Test]
-		public void T02_Load()
+		public async Task T02_Load()
 		{
 			Thread.Sleep(5000);
-			ChannelResponse cr = _ua.Channel(_ta.IosChannel);
+			ChannelResponse cr = await _ua.Channel(_ta.IosChannel);
 			GetTest(cr, () => new[] { _remlist.First() });
         }
 
@@ -91,30 +91,30 @@ namespace UrbanAirSharp.Tests.Ignores
 		}
 
 		[Test]
-		public void T03_Update()
+		public async Task T03_Update()
 		{
 			var to = new TagSet(_ta);
 			to.Set.Add(TAG_GROUP, _remlist);
-			OpTest(_ua.ChannelTags(to));
+			OpTest(await _ua.ChannelTags(to));
 		}
 
 		[Test]
-		public void T04_Reload()
+		public async Task T04_Reload()
 		{
 			Thread.Sleep(5000);
-			ChannelResponse cr = _ua.Channel(_ta.IosChannel);
+			ChannelResponse cr = await _ua.Channel(_ta.IosChannel);
 			GetTest(cr, () => _remlist);
 		}
 
 		[Test]
-		public void T05_Delete()
+		public async Task T05_Delete()
 		{
 			var to = new TagAddRemove(_ta);
 			to.Remove.Add(TAG_GROUP, _remlist);
-			OpTest(_ua.ChannelTags(to));
+			OpTest(await _ua.ChannelTags(to));
 
 			Thread.Sleep(5000);
-			ChannelResponse cr = _ua.Channel(_ta.IosChannel);
+			ChannelResponse cr = await _ua.Channel(_ta.IosChannel);
 			OpTest(cr);
 			Assert.IsNotNull(cr.Channel);
 			Assert.That(!cr.Channel.TagGroups.ContainsKey(TAG_GROUP) || cr.Channel.TagGroups[TAG_GROUP].Count == 0);

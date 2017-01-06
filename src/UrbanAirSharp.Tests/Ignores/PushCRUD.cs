@@ -27,7 +27,7 @@ namespace UrbanAirSharp.Tests.Ignores
 		
 		[TestCase("DeviceToken Push Test from UrbanAirSharp UnitTest", @"F1F0EA5D64313623203333CD38D4D1D08BBA19DF2F18209590267E28A83B5F8E", "+1")]
 		[TestCase("", @"F1F0EA5D64313623203333CD38D4D1D08BBA19DF2F18209590267E28A83B5F8E", 0)]
-		public void PushToken(string message, string iosDeviceToken, IComparable badge)
+		public async Task PushToken(string message, string iosDeviceToken, IComparable badge)
 		{
 			//Assert.That(!string.IsNullOrWhiteSpace(message));
 			Assert.That(!string.IsNullOrWhiteSpace(iosDeviceToken));
@@ -42,10 +42,10 @@ namespace UrbanAirSharp.Tests.Ignores
 			var p = new Push(new Audience(Type.AudienceType.Ios, iosDeviceToken), message);
 			p.Notification.IosAlert = new IosAlert { Badge = badge };
 
-			PushResponse pv = _ua.Validate(p);
+			PushResponse pv = await _ua.Validate(p);
 			TestResponse(pv);
 
-			PushResponse pr = _ua.Push(p);
+			PushResponse pr = await _ua.Push(p);
 			TestResponse(pr);
 			CollectionAssert.IsNotEmpty(pr.PushIds);
 		}
@@ -60,7 +60,7 @@ namespace UrbanAirSharp.Tests.Ignores
 		
 		[TestCase("Channel Push Test from UrbainAirSharp UnitTest", @"a1e4ae13-7595-454c-bf96-e85b38ab265b", "+1")]
 		[TestCase("", @"a1e4ae13-7595-454c-bf96-e85b38ab265b", 0)]
-		public void PushChannel(string message, string channelId, IComparable badge)
+		public async Task PushChannel(string message, string channelId, IComparable badge)
 		{
 			//Assert.That(!string.IsNullOrWhiteSpace(message));
 			Assert.That(!string.IsNullOrWhiteSpace(channelId));
@@ -75,10 +75,10 @@ namespace UrbanAirSharp.Tests.Ignores
 			var p = new Push(new Audience(Type.AudienceType.Ios, channelId, true), message);
 			p.Notification.IosAlert = new IosAlert { Badge = badge };
 
-			PushResponse pv = _ua.Validate(p);
+			PushResponse pv = await _ua.Validate(p);
 			TestResponse(pv);
 
-			PushResponse pr = _ua.Push(p);
+			PushResponse pr = await _ua.Push(p);
 			TestResponse(pr);
 			CollectionAssert.IsNotEmpty(pr.PushIds);
 		}

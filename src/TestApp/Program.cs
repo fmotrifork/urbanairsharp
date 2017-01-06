@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2014-2015 Jeff Gosling (jeffery.gosling@gmail.com)
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UrbanAirSharp;
 using UrbanAirSharp.Dto;
 using UrbanAirSharp.Type;
@@ -21,52 +22,58 @@ namespace TestApp
         {
             _urbanAirSharpGateway = new UrbanAirSharpGateway(AppKey, AppMasterSecret);
 
-	        TestValidate();
-	        TestPush();
-			TestRegisterDevice();
-			TestSchedules();
-			TestTags();
+            var t = Task.Run(() =>
+            {
+                TestValidate();
+                TestPush();
+                TestRegisterDevice();
+                TestSchedules();
+                TestTags();
+
+            });
+            t.Wait();
+            
 
             Console.ReadLine();
         }
 
-		private static void TestValidate()
+		private static async Task TestValidate()
 		{
 			Console.WriteLine("================ TESTING VALIDATE ================");
 			Console.WriteLine();
 
-			var response = _urbanAirSharpGateway.Validate(new Push(new Device(TestDeviceGuid, DeviceType.Android), "Validate push"));
+			var response = await _urbanAirSharpGateway.Validate(new Push(new Device(TestDeviceGuid, DeviceType.Android), "Validate push"));
 
 			Console.Write(response.HttpResponseCode + " - ");
 			Console.WriteLine(response.Ok ? "SUCCESS" : "FAILED");
 			Console.WriteLine();
 		}
 
-		private static void TestPush()
+		private static async Task TestPush()
 		{
 			Console.WriteLine("================ TESTING PUSH ================");
 			Console.WriteLine();
 
 			Console.WriteLine("PUSH Broadcast Alert");
-			var response = _urbanAirSharpGateway.Push(new Push("Broadcast Alert"));
+			var response = await _urbanAirSharpGateway.Push(new Push("Broadcast Alert"));
 			Console.Write(response.HttpResponseCode + " - ");
 			Console.WriteLine(response.Ok ? "SUCCESS" : "FAILED");
 			Console.WriteLine();
 
 			Console.WriteLine("PUSH Broadcast Alert to Androids");
-			response = _urbanAirSharpGateway.Push(new Push("Broadcast Alert to Androids") { DeviceTypes = new[] { DeviceType.Android } });
+			response = await _urbanAirSharpGateway.Push(new Push("Broadcast Alert to Androids") { DeviceTypes = new[] { DeviceType.Android } });
 			Console.Write(response.HttpResponseCode + " - ");
 			Console.WriteLine(response.Ok ? "SUCCESS" : "FAILED");
 			Console.WriteLine();
 
 			Console.WriteLine("PUSH Targeted Alert to device");
-			response = _urbanAirSharpGateway.Push(new Push(new Device("android-id-blah-blah", DeviceType.Android), "Targeted Alert to device"));
+			response = await _urbanAirSharpGateway.Push(new Push(new Device("android-id-blah-blah", DeviceType.Android), "Targeted Alert to device"));
             Console.Write(response.HttpResponseCode + " - ");
 			Console.WriteLine(response.Ok ? "SUCCESS" : "FAILED");
 			Console.WriteLine();
 
 			Console.WriteLine("PUSH Custom Alert per device type");
-			response = _urbanAirSharpGateway.Push(new Push("Custom Alert per device type", new[]
+			response = await _urbanAirSharpGateway.Push(new Push("Custom Alert per device type", new[]
             {
                 new AndroidAlert
                 {
@@ -93,18 +100,18 @@ namespace TestApp
 			var customAudience2 = rugbyFanAudience & fansAudience & !newZealandAudience & !englishAudience;
 
 			Console.WriteLine("PUSH to custom Audience");
-			response = _urbanAirSharpGateway.Push(new Push(customAudience, "Rugby fans that's not English or NewZealanders"));
+			response = await _urbanAirSharpGateway.Push(new Push(customAudience, "Rugby fans that's not English or NewZealanders"));
 
 			Console.Write(response.HttpResponseCode + " - ");
 			Console.WriteLine(response.Ok ? "SUCCESS" : "FAILED");
 			Console.WriteLine();
 		}
 
-		private static void TestRegisterDevice()
+		private static async Task TestRegisterDevice()
 	    {
 			Console.WriteLine("================ TESTING REGISTERING A DEVICE TOKEN ================");
 			Console.WriteLine();
-			var response = _urbanAirSharpGateway.RegisterDeviceToken(TestDeviceToken);
+			var response = await _urbanAirSharpGateway.RegisterDeviceToken(TestDeviceToken);
 			Console.WriteLine("Register Device Response: Ok?: {0}   Message: {1}  ErrorCode: {2}  ErrorMessage: {3}", 
 				response.Ok, 
 				response.Message, 
@@ -116,7 +123,7 @@ namespace TestApp
 			Console.WriteLine();
 	    }
 
-		private static void TestTags()
+		private static async Task TestTags()
 		{
 			Console.WriteLine("================ TESTING TAGS ================");
 			Console.WriteLine();
@@ -133,19 +140,19 @@ namespace TestApp
 			};
 
 			Console.WriteLine("CREATE TAG:");
-			var response = _urbanAirSharpGateway.CreateTag(tag);
+			var response = await _urbanAirSharpGateway.CreateTag(tag);
 			Console.Write(response.HttpResponseCode + " - ");
 			Console.WriteLine(response.Ok ? "SUCCESS" : "FAILED");
 			Console.WriteLine();
 
 			Console.WriteLine("LIST TAGS:");
-			var listResponse = _urbanAirSharpGateway.ListTags();
+			var listResponse = await _urbanAirSharpGateway.ListTags();
 			Console.Write(listResponse.HttpResponseCode + " - ");
 			Console.WriteLine(listResponse.Ok ? "SUCCESS" : "FAILED");
 			Console.WriteLine();
 
 			Console.WriteLine("DELETE TAG:");
-			response = _urbanAirSharpGateway.DeleteTag(testTag);
+			response = await _urbanAirSharpGateway.DeleteTag(testTag);
 			Console.Write(response.HttpResponseCode + " - ");
 			Console.WriteLine(response.Ok ? "SUCCESS" : "FAILED");
 			Console.WriteLine();
@@ -159,7 +166,7 @@ namespace TestApp
 
 			var message = new Push(compoundAudience, "What's up");
 
-			client.Push(new Push("Custom Android Alert per device type", new[]
+			await client.Push(new Push("Custom Android Alert per device type", new[]
 			{
 				new AndroidAlert()
 				{
@@ -171,7 +178,7 @@ namespace TestApp
 			}));
 		}
 
-		private static void TestSchedules()
+		private static async Task TestSchedules()
 		{
 			Console.WriteLine("================ TESTING SCHEDULES ================");
 			Console.WriteLine();
@@ -187,13 +194,13 @@ namespace TestApp
 			};
 
 			Console.WriteLine("CREATE SCHEDULE:");
-			var createResponse = _urbanAirSharpGateway.CreateSchedule(schedule);
+			var createResponse = await _urbanAirSharpGateway.CreateSchedule(schedule);
 			Console.Write(createResponse.HttpResponseCode + " - ");
 			Console.WriteLine(createResponse.Ok ? "SUCCESS" : "FAILED");
 			Console.WriteLine();
 
 			Console.WriteLine("LIST SCHEDULES:");
-			var listResponse = _urbanAirSharpGateway.ListSchedules();
+			var listResponse = await _urbanAirSharpGateway.ListSchedules();
 			Console.Write(listResponse.HttpResponseCode + " - ");
 			Console.WriteLine(listResponse.Ok ? "SUCCESS" : "FAILED");
 			Console.WriteLine();
@@ -206,13 +213,13 @@ namespace TestApp
 			}
 
 			Console.WriteLine("GET SCHEDULE:");
-			var getResponse = _urbanAirSharpGateway.GetSchedule(scheduleId);
+			var getResponse = await _urbanAirSharpGateway.GetSchedule(scheduleId);
 			Console.Write(getResponse.HttpResponseCode + " - ");
 			Console.WriteLine(getResponse.Ok ? "SUCCESS" : "FAILED");
 			Console.WriteLine();
 
 			Console.WriteLine("DELETE SCHEDULE:");
-			var deleteResponse = _urbanAirSharpGateway.DeleteSchedule(scheduleId);
+			var deleteResponse = await _urbanAirSharpGateway.DeleteSchedule(scheduleId);
 			Console.Write(deleteResponse.HttpResponseCode + " - ");
 			Console.WriteLine(deleteResponse.Ok ? "SUCCESS" : "FAILED");
 			Console.WriteLine();

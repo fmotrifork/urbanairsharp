@@ -77,10 +77,10 @@ namespace UrbanAirSharp
 		/// <param name="deviceAlerts">per device alert messages and extras</param>
 		/// <param name="customAudience">a more specific way to choose the audience for the push. If this is set, deviceId is ignored</param>
 		[Obsolete("Please use the other versions of this method.", false)]
-		public PushResponse Push(String alert, IEnumerable<DeviceType> deviceTypes = null, String deviceId = null, IEnumerable<BaseAlert> deviceAlerts = null, Audience customAudience = null)
+		public async Task<PushResponse> Push(String alert, IEnumerable<DeviceType> deviceTypes = null, String deviceId = null, IEnumerable<BaseAlert> deviceAlerts = null, Audience customAudience = null)
 		{
 			Push content = BackwardCompatibilityCreate(alert, deviceTypes, deviceId, deviceAlerts, customAudience);
-			return Push(content);
+			return await Push(content);
         }
 
 		[Obsolete("Please do not use, it is only here to support old Push(...) and Validate(...) methods!")]
@@ -97,10 +97,10 @@ namespace UrbanAirSharp
 			return content;
 		}
 
-		public PushResponse Push(Push content)
+		public async Task<PushResponse> Push(Push content)
 		{
 			var request = new PushRequest(content, _cfg);
-			return SendRequest(request);
+			return await SendRequest(request);
 		}
 
 		/// <summary>
@@ -112,47 +112,47 @@ namespace UrbanAirSharp
 		/// <param name="deviceAlerts">per device alert messages and extras</param>
 		/// <param name="customAudience">a more specific way to choose the audience for the push. If this is set, deviceId is ignored</param>
 		[Obsolete("Please use the other versions of this method.", false)]
-		public PushResponse Validate(String alert, IEnumerable<DeviceType> deviceTypes = null, String deviceId = null,
+		public Task<PushResponse> Validate(String alert, IEnumerable<DeviceType> deviceTypes = null, String deviceId = null,
 			IEnumerable<BaseAlert> deviceAlerts = null, Audience customAudience = null)
 		{
 			Push content = BackwardCompatibilityCreate(alert, deviceTypes, deviceId, deviceAlerts, customAudience);
 			return Validate(content);
 		}
 
-		public PushResponse Validate(Push content)
+		public async Task<PushResponse> Validate(Push content)
 		{
 			var request = new PushValidateRequest(content, _cfg);
-			return SendRequest(request);
+			return await SendRequest(request);
 		}
 
-		public ScheduleCreateResponse CreateSchedule(Schedule schedule)
+		public async Task<ScheduleCreateResponse> CreateSchedule(Schedule schedule)
         {
 			var request = new ScheduleCreateRequest(schedule, _cfg);
-            return SendRequest(request);
+            return await SendRequest(request);
         }
 
-		public ScheduleEditResponse EditSchedule(Guid scheduleId, Schedule schedule)
+		public async Task<ScheduleEditResponse> EditSchedule(Guid scheduleId, Schedule schedule)
         {
 			var request = new ScheduleEditRequest(scheduleId, schedule, _cfg);
-            return SendRequest(request);
+            return await SendRequest(request);
         }
 
-		public BaseResponse DeleteSchedule(Guid scheduleId)
+		public Task<BaseResponse> DeleteSchedule(Guid scheduleId)
         {
 			var request = new ScheduleDeleteRequest(scheduleId, _cfg);
             return SendRequest(request);
         }
 
-        public ScheduleGetResponse GetSchedule(Guid scheduleId)
+        public async Task<ScheduleGetResponse> GetSchedule(Guid scheduleId)
         {
 			var request = new ScheduleGetRequest(scheduleId, _cfg);
-            return SendRequest(request);
+            return await SendRequest(request);
         }
 
-        public ScheduleListResponse ListSchedules()
+        public async Task<ScheduleListResponse> ListSchedules()
         {
 			var request = new ScheduleListRequest(_cfg);
-            return SendRequest(request);
+            return await SendRequest(request);
         }
 
 		/// <summary>
@@ -161,9 +161,9 @@ namespace UrbanAirSharp
 		/// will make it active again.
 		/// </summary>
 		/// <returns>Response from Urban Airship</returns>
-		public BaseResponse RegisterDeviceToken(string deviceToken)
+		public async Task<BaseResponse> RegisterDeviceToken(string deviceToken)
 		{
-			return RegisterDeviceToken(new DeviceToken() {Token = deviceToken});
+			return await RegisterDeviceToken(new DeviceToken() {Token = deviceToken});
 		}
 
 		/// <summary>
@@ -171,49 +171,60 @@ namespace UrbanAirSharp
 		/// tokens and for existing tokens. If a token has become inactive reregistering it will make it active again. 
 		/// </summary>
 		/// <returns>Response from Urban Airship</returns>
-		public BaseResponse RegisterDeviceToken(DeviceToken deviceToken)
+		public async Task<BaseResponse> RegisterDeviceToken(DeviceToken deviceToken)
 		{
 			if (string.IsNullOrEmpty(deviceToken.Token))
 				throw new ArgumentException("A device Tokens Token field is Required", "deviceToken");
 
 			var request = new DeviceTokenRequest(deviceToken, _cfg);
-            return SendRequest(request);
+            return await SendRequest(request);
 		}
 
 		/// <see cref="http://docs.urbanairship.com/api/ua.html#tags"/>
 		[Obsolete("Please use the channel based tag creation.  This method will be deprecated in the next UA. API release.", false)]
-		public BaseResponse CreateTag(Tag tag)
+		public async Task<BaseResponse> CreateTag(Tag tag)
 		{
 			if (string.IsNullOrEmpty(tag.TagName))
 				throw new ArgumentException("A tag name is Required", "tag.TagName");
 
 			var request = new TagCreateRequest(tag, _cfg);
-            return SendRequest(request);
+            return await SendRequest(request);
 		}
 
 		/// <see cref="http://docs.urbanairship.com/api/ua.html#tags"/>
 		[Obsolete("Please use the channel based tag creation.  This method will be deprecated in the next UA. API release.", false)]
-		public BaseResponse DeleteTag(string tag)
+		public async Task<BaseResponse> DeleteTag(string tag)
 		{
 			if (string.IsNullOrEmpty(tag))
 				throw new ArgumentException("A tag is Required", "tag");
 
 			var request = new TagDeleteRequest(tag, _cfg);
-            return SendRequest(request);
+            return await SendRequest(request);
 		}
 
 		/// <see cref="http://docs.urbanairship.com/api/ua.html#tags"/>
 		[Obsolete("Please use the channel based tag creation.  This method will be deprecated in the next UA. API release.", false)]
-		public TagListResponse ListTags()
+		public async Task<TagListResponse> ListTags()
 		{
 			var request = new TagListRequest(_cfg);
-            return SendRequest(request);
+            return await SendRequest(request);
 		}
 
-		public ChannelResponse Channel(string channelId)
+		public async Task<ChannelResponse> Channel(string channelId)
 		{
 			var request = new ChannelRequest(channelId, _cfg);
-			return SendRequest(request);
+			return await SendRequest(request);
+		}
+
+        /// <summary>
+        /// Manipulate tags using channel ids
+        /// </summary>
+        /// <param name="operations">operation instruction</param>
+        /// <returns>standard response</returns>
+        public async Task<BaseResponse> ChannelTags(TagAddRemove operations)
+		{
+			var request = new ChannelTagRequest(operations, _cfg);
+			return await SendRequest(request);
 		}
 
 		/// <summary>
@@ -221,30 +232,19 @@ namespace UrbanAirSharp
 		/// </summary>
 		/// <param name="operations">operation instruction</param>
 		/// <returns>standard response</returns>
-		public BaseResponse ChannelTags(TagAddRemove operations)
+		public async Task<BaseResponse> ChannelTags(TagSet operations)
 		{
 			var request = new ChannelTagRequest(operations, _cfg);
-			return SendRequest(request);
+			return await SendRequest(request);
 		}
 
-		/// <summary>
-		/// Manipulate tags using channel ids
-		/// </summary>
-		/// <param name="operations">operation instruction</param>
-		/// <returns>standard response</returns>
-		public BaseResponse ChannelTags(TagSet operations)
-		{
-			var request = new ChannelTagRequest(operations, _cfg);
-			return SendRequest(request);
-		}
-
-		static TResponse SendRequest<TResponse>(BaseRequest<TResponse> request) where TResponse : BaseResponse, new()
+		static async Task<TResponse> SendRequest<TResponse>(BaseRequest<TResponse> request) where TResponse : BaseResponse, new()
 		{
 			try
 			{
-				var requestTask = request.ExecuteAsync();
+				var requestTask = await request.ExecuteAsync();
 
-				return requestTask.Result;
+				return requestTask;
 			}
 			catch (Exception e)
 			{
